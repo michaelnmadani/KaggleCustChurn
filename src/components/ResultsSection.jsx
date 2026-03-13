@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, Legend,
+  ResponsiveContainer, Cell, Legend,
 } from 'recharts'
 import { BarChart3, Award } from 'lucide-react'
 
@@ -97,15 +96,6 @@ export default function ResultsSection({ data }) {
   const barData = metricsForChart.map(m => {
     const row = { metric: m.replace('_', ' ').toUpperCase() }
     ALL_KEYS.forEach(k => { row[ALL_LABELS[k]] = getMetrics(k)?.[m] ?? 0 })
-    return row
-  })
-
-  // Radar
-  const radarData = metricsForChart.map(m => {
-    const row = { metric: m.replace('roc_auc', 'AUC').toUpperCase() }
-    ALL_KEYS.forEach(k => {
-      row[ALL_LABELS[k]] = parseFloat(((getMetrics(k)?.[m] ?? 0) * 100).toFixed(1))
-    })
     return row
   })
 
@@ -222,46 +212,6 @@ export default function ResultsSection({ data }) {
               />
             ))}
           </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Radar chart */}
-      <div className="card mb-6">
-        <p className="text-sm font-semibold text-white mb-1">Radar — Multi-Metric Comparison</p>
-        <p className="text-xs text-slate-400 mb-4">Values as percentages (0–100)</p>
-        <ResponsiveContainer width="100%" height={360}>
-          <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
-            <PolarGrid stroke="#1e293b" />
-            <PolarAngleAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 9 }} tickCount={4} />
-            {MODEL_KEYS.map(k => (
-              <Radar
-                key={k}
-                name={MODEL_LABELS[k]}
-                dataKey={MODEL_LABELS[k]}
-                stroke={MODEL_COLORS[k]}
-                fill={MODEL_COLORS[k]}
-                fillOpacity={0.08}
-                strokeWidth={1.5}
-                strokeDasharray="4 2"
-              />
-            ))}
-            {BLEND_KEYS.map(k => (
-              <Radar
-                key={k}
-                name={BLEND_LABELS[k]}
-                dataKey={BLEND_LABELS[k]}
-                stroke={BLEND_COLORS[k]}
-                fill={BLEND_COLORS[k]}
-                fillOpacity={0.2}
-                strokeWidth={2.5}
-              />
-            ))}
-            <Legend
-              wrapperStyle={{ fontSize: 11 }}
-              formatter={v => <span style={{ color: '#cbd5e1' }}>{v}</span>}
-            />
-          </RadarChart>
         </ResponsiveContainer>
       </div>
 

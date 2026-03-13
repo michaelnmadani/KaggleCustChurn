@@ -59,7 +59,7 @@ export default function XGBoostSection({ data }) {
           <div className="flex items-center gap-2 mb-4">
             <BrainCircuit size={16} className="text-blue-400" />
             <span className="text-sm font-semibold text-white">
-              Training Log — Log-Loss over Boosting Rounds
+              Training Log — Log-Loss over Boosting Rounds (full dataset)
             </span>
           </div>
           <ResponsiveContainer width="100%" height={280}>
@@ -82,12 +82,8 @@ export default function XGBoostSection({ data }) {
                 formatter={v => <span style={{ color: '#cbd5e1' }}>{v}</span>}
               />
               <Line
-                type="monotone" dataKey="train_logloss" name="Train"
+                type="monotone" dataKey="train_logloss" name="Train (full data)"
                 stroke="#3b82f6" strokeWidth={2} dot={false}
-              />
-              <Line
-                type="monotone" dataKey="val_logloss" name="Validation"
-                stroke="#f59e0b" strokeWidth={2} dot={false} strokeDasharray="5 3"
               />
             </LineChart>
           </ResponsiveContainer>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   LineChart, Line, ResponsiveContainer, Legend, Cell,
 } from 'recharts'
@@ -105,18 +104,6 @@ export default function BlendSection({ data }) {
   const rocData = Array.from({ length: maxLen }, (_, i) => {
     const row = { fpr: rocSeries[0]?.data?.fpr?.[i] ?? 0 }
     rocSeries.forEach(s => { row[s.key] = s.data?.tpr?.[i] ?? null })
-    return row
-  })
-
-  // Radar: blend vs each base model — accuracy, precision, recall, f1, auc
-  const METRICS_RADAR = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
-  const radarData = METRICS_RADAR.map(m => {
-    const row = { metric: m.replace('roc_auc', 'AUC').toUpperCase() }
-    Object.entries(models).forEach(([k, v]) => {
-      row[MODEL_DISPLAY[k]] = parseFloat(((v.metrics?.[m] ?? 0) * 100).toFixed(1))
-    })
-    row['Blend (Simple)']   = parseFloat(((simple.metrics?.[m] ?? 0) * 100).toFixed(1))
-    row['Blend (AUC-Wtd)']  = parseFloat(((aucWtd.metrics?.[m] ?? 0) * 100).toFixed(1))
     return row
   })
 
@@ -295,33 +282,6 @@ export default function BlendSection({ data }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Radar */}
-      <div className="card">
-        <p className="text-sm font-semibold text-white mb-1">Multi-Metric Radar — Blends vs Base Models</p>
-        <p className="text-xs text-slate-400 mb-4">Values as percentages (0–100)</p>
-        <ResponsiveContainer width="100%" height={360}>
-          <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
-            <PolarGrid stroke="#1e293b" />
-            <PolarAngleAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 9 }} tickCount={4} />
-            {Object.entries(models).map(([k], i) => (
-              <Radar
-                key={k}
-                name={MODEL_DISPLAY[k]}
-                dataKey={MODEL_DISPLAY[k]}
-                stroke={BASE_COLORS[i]}
-                fill={BASE_COLORS[i]}
-                fillOpacity={0.08}
-                strokeWidth={1.5}
-                strokeDasharray="4 2"
-              />
-            ))}
-            <Radar name="Blend (Simple)"   dataKey="Blend (Simple)"   stroke={VARIANT_COLORS.simple}       fill={VARIANT_COLORS.simple}       fillOpacity={0.18} strokeWidth={2.5} />
-            <Radar name="Blend (AUC-Wtd)" dataKey="Blend (AUC-Wtd)" stroke={VARIANT_COLORS.auc_weighted} fill={VARIANT_COLORS.auc_weighted} fillOpacity={0.18} strokeWidth={2.5} />
-            <Legend wrapperStyle={{ fontSize: 11 }} formatter={v => <span style={{ color: '#cbd5e1' }}>{v}</span>} />
-          </RadarChart>
-        </ResponsiveContainer>
-      </div>
     </section>
   )
 }
