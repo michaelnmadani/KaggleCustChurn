@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-03-13T10:17:03.658962",
+    "generated_at": "2026-03-13T10:26:11.665247",
     "train_samples": 8000,
     "test_samples": 2000,
     "n_features": 19,
@@ -550,7 +550,7 @@
       "PaperlessBilling": "No",
       "PaymentMethod": "Bank transfer (automatic)",
       "MonthlyCharges": 53.15,
-      "TotalCharges": NaN,
+      "TotalCharges": null,
       "Churn": 0
     },
     {
@@ -1263,7 +1263,7 @@
       "PaperlessBilling": "No",
       "PaymentMethod": "Credit card (automatic)",
       "MonthlyCharges": 83.79,
-      "TotalCharges": NaN,
+      "TotalCharges": null,
       "Churn": 0
     },
     {
@@ -1723,7 +1723,7 @@
       "PaperlessBilling": "No",
       "PaymentMethod": "Electronic check",
       "MonthlyCharges": 24.45,
-      "TotalCharges": NaN,
+      "TotalCharges": null,
       "Churn": 0
     },
     {
@@ -2413,7 +2413,7 @@
       "PaperlessBilling": "Yes",
       "PaymentMethod": "Electronic check",
       "MonthlyCharges": 108.08,
-      "TotalCharges": NaN,
+      "TotalCharges": null,
       "Churn": 0
     },
     {
