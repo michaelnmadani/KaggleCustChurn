@@ -1,0 +1,5066 @@
+{
+  "meta": {
+    "generated_at": "2026-03-13T09:35:43.060252",
+    "train_samples": 8000,
+    "test_samples": 2000,
+    "n_features": 19,
+    "features": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "tenure",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod",
+      "MonthlyCharges",
+      "TotalCharges"
+    ]
+  },
+  "dataset_stats": {
+    "total_rows": 10000,
+    "total_cols": 21,
+    "churn_rate": 0.1042,
+    "missing_values": {
+      "TotalCharges": 507
+    },
+    "column_types": {
+      "customerID": "str",
+      "gender": "str",
+      "SeniorCitizen": "int64",
+      "Partner": "str",
+      "Dependents": "str",
+      "tenure": "int64",
+      "PhoneService": "str",
+      "MultipleLines": "str",
+      "InternetService": "str",
+      "OnlineSecurity": "str",
+      "OnlineBackup": "str",
+      "DeviceProtection": "str",
+      "TechSupport": "str",
+      "StreamingTV": "str",
+      "StreamingMovies": "str",
+      "Contract": "str",
+      "PaperlessBilling": "str",
+      "PaymentMethod": "str",
+      "MonthlyCharges": "float64",
+      "TotalCharges": "float64",
+      "Churn": "int64"
+    },
+    "class_distribution": {
+      "No": 8958,
+      "Yes": 1042
+    },
+    "numeric_summaries": [
+      {
+        "feature": "SeniorCitizen",
+        "mean": 0.156,
+        "std": 0.363,
+        "min": 0.0,
+        "max": 1.0,
+        "median": 0.0,
+        "missing": 0
+      },
+      {
+        "feature": "tenure",
+        "mean": 35.753,
+        "std": 21.067,
+        "min": 0.0,
+        "max": 72.0,
+        "median": 36.0,
+        "missing": 0
+      },
+      {
+        "feature": "MonthlyCharges",
+        "mean": 68.593,
+        "std": 29.023,
+        "min": 18.01,
+        "max": 118.0,
+        "median": 68.865,
+        "missing": 0
+      },
+      {
+        "feature": "TotalCharges",
+        "mean": 2459.877,
+        "std": 1879.505,
+        "min": -115.96,
+        "max": 8446.97,
+        "median": 1991.6,
+        "missing": 507
+      },
+      {
+        "feature": "Churn",
+        "mean": 0.104,
+        "std": 0.306,
+        "min": 0.0,
+        "max": 1.0,
+        "median": 0.0,
+        "missing": 0
+      }
+    ],
+    "categorical_summaries": [
+      {
+        "feature": "gender",
+        "values": [
+          {
+            "label": "Male",
+            "count": 5061
+          },
+          {
+            "label": "Female",
+            "count": 4939
+          }
+        ]
+      },
+      {
+        "feature": "Partner",
+        "values": [
+          {
+            "label": "No",
+            "count": 5028
+          },
+          {
+            "label": "Yes",
+            "count": 4972
+          }
+        ]
+      },
+      {
+        "feature": "Dependents",
+        "values": [
+          {
+            "label": "No",
+            "count": 7041
+          },
+          {
+            "label": "Yes",
+            "count": 2959
+          }
+        ]
+      },
+      {
+        "feature": "PhoneService",
+        "values": [
+          {
+            "label": "Yes",
+            "count": 8951
+          },
+          {
+            "label": "No",
+            "count": 1049
+          }
+        ]
+      },
+      {
+        "feature": "MultipleLines",
+        "values": [
+          {
+            "label": "No",
+            "count": 4500
+          },
+          {
+            "label": "Yes",
+            "count": 4451
+          },
+          {
+            "label": "No phone service",
+            "count": 1049
+          }
+        ]
+      },
+      {
+        "feature": "InternetService",
+        "values": [
+          {
+            "label": "Fiber optic",
+            "count": 4411
+          },
+          {
+            "label": "DSL",
+            "count": 3389
+          },
+          {
+            "label": "No",
+            "count": 2200
+          }
+        ]
+      },
+      {
+        "feature": "OnlineSecurity",
+        "values": [
+          {
+            "label": "No",
+            "count": 5567
+          },
+          {
+            "label": "Yes",
+            "count": 2233
+          },
+          {
+            "label": "No internet service",
+            "count": 2200
+          }
+        ]
+      },
+      {
+        "feature": "OnlineBackup",
+        "values": [
+          {
+            "label": "No",
+            "count": 5184
+          },
+          {
+            "label": "Yes",
+            "count": 2616
+          },
+          {
+            "label": "No internet service",
+            "count": 2200
+          }
+        ]
+      }
+    ]
+  },
+  "raw_sample": [
+    {
+      "customerID": "CUST_000000",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 6,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 102.34,
+      "TotalCharges": 645.61,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000001",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 25,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 93.41,
+      "TotalCharges": 2402.55,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000002",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 52,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 68.12,
+      "TotalCharges": 3555.57,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000003",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 30,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 78.08,
+      "TotalCharges": 2328.03,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000004",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 12,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 91.37,
+      "TotalCharges": 1156.38,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000005",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 71,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 47.2,
+      "TotalCharges": 3389.44,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000006",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 14,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 30.91,
+      "TotalCharges": 347.84,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000007",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 6,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 35.32,
+      "TotalCharges": 288.73,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000008",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 27,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 56.51,
+      "TotalCharges": 1485.99,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000009",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 8,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 20.12,
+      "TotalCharges": 194.67,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000010",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 43,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 103.74,
+      "TotalCharges": 4463.95,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000011",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 31,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 84.7,
+      "TotalCharges": 2477.56,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000012",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 67,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 54.9,
+      "TotalCharges": 3758.75,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000013",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 12,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 53.15,
+      "TotalCharges": NaN,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000014",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 19,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 60.58,
+      "TotalCharges": 1133.58,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000015",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 49,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 67.49,
+      "TotalCharges": 3424.78,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000016",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 50,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 55.74,
+      "TotalCharges": 2779.23,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000017",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 26,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 116.29,
+      "TotalCharges": 3015.52,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000018",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 67,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 21.47,
+      "TotalCharges": 1420.02,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000019",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 61,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 86.45,
+      "TotalCharges": 5305.96,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000020",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 44,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 77.11,
+      "TotalCharges": 3420.34,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000021",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 54,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 56.72,
+      "TotalCharges": 3058.96,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000022",
+      "gender": "Male",
+      "SeniorCitizen": 1,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 39,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 20.68,
+      "TotalCharges": 788.75,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000023",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 34,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 91.21,
+      "TotalCharges": 3146.23,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000024",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 39,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 21.05,
+      "TotalCharges": 791.23,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000025",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 61,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 89.76,
+      "TotalCharges": 5504.64,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000026",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 1,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 83.53,
+      "TotalCharges": 96.48,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000027",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 7,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 46.29,
+      "TotalCharges": 218.0,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000028",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 34,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 36.07,
+      "TotalCharges": 1231.76,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000029",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 42,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 72.0,
+      "TotalCharges": 2980.64,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000030",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 13,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 48.53,
+      "TotalCharges": 642.31,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000031",
+      "gender": "Male",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 44,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 97.78,
+      "TotalCharges": 4321.17,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000032",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 1,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 41.3,
+      "TotalCharges": 105.26,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000033",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 17,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 112.65,
+      "TotalCharges": 1932.89,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000034",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 33,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 27.42,
+      "TotalCharges": 924.81,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000035",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 3,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 42.54,
+      "TotalCharges": 97.06,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000036",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 46,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 66.79,
+      "TotalCharges": 3053.79,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000037",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 39,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 64.66,
+      "TotalCharges": 2579.34,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000038",
+      "gender": "Male",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 41,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 106.63,
+      "TotalCharges": 4340.35,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000039",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 37,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 19.99,
+      "TotalCharges": 715.21,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000040",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 50,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 97.42,
+      "TotalCharges": 4864.45,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000041",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 47,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 33.0,
+      "TotalCharges": 1633.13,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000042",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 48,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 40.34,
+      "TotalCharges": 1904.23,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000043",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 15,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 24.9,
+      "TotalCharges": 477.33,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000044",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 50,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 83.79,
+      "TotalCharges": NaN,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000045",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 13,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 59.25,
+      "TotalCharges": 835.12,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000046",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 1,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 43.74,
+      "TotalCharges": 21.74,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000047",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 71,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 101.78,
+      "TotalCharges": 7218.64,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000048",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 13,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 112.48,
+      "TotalCharges": 1444.84,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000049",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 8,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 70.75,
+      "TotalCharges": 612.49,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000050",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 22,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 98.07,
+      "TotalCharges": 2163.41,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000051",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 72,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 25.74,
+      "TotalCharges": 1859.67,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000052",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 63,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 86.77,
+      "TotalCharges": 5446.73,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000053",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 52,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 63.86,
+      "TotalCharges": 3355.86,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000054",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 13,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 91.64,
+      "TotalCharges": 1197.37,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000055",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 45,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 30.92,
+      "TotalCharges": 1332.33,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000056",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 60,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 109.98,
+      "TotalCharges": 6601.55,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000057",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 24,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 106.0,
+      "TotalCharges": 2505.86,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000058",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 18,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 55.81,
+      "TotalCharges": 934.87,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000059",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 63,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 29.59,
+      "TotalCharges": 1763.8,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000060",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 9,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 50.13,
+      "TotalCharges": 384.02,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000061",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 66,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 97.56,
+      "TotalCharges": 6512.78,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000062",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 34,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 25.6,
+      "TotalCharges": 814.89,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000063",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 52,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 66.38,
+      "TotalCharges": 3482.75,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000064",
+      "gender": "Male",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 27,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 24.45,
+      "TotalCharges": NaN,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000065",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 51,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 97.9,
+      "TotalCharges": 4940.72,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000066",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 67,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 22.64,
+      "TotalCharges": 1509.04,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000067",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 36,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 84.14,
+      "TotalCharges": 3122.49,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000068",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 15,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 50.29,
+      "TotalCharges": 815.03,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000069",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 5,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 110.4,
+      "TotalCharges": 625.7,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000070",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 67,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 46.56,
+      "TotalCharges": 3098.35,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000071",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 72,
+      "PhoneService": "No",
+      "MultipleLines": "No phone service",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 70.43,
+      "TotalCharges": 5118.13,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000072",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 47,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Two year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 77.21,
+      "TotalCharges": 3600.23,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000073",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 1,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 100.79,
+      "TotalCharges": 73.94,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000074",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 64,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 99.69,
+      "TotalCharges": 6487.42,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000075",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 36,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 54.95,
+      "TotalCharges": 2018.31,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000076",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 17,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 21.91,
+      "TotalCharges": 447.4,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000077",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 26,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 92.97,
+      "TotalCharges": 2347.75,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000078",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 68,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 98.76,
+      "TotalCharges": 6685.45,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000079",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 56,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 85.96,
+      "TotalCharges": 4740.72,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000080",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 43,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 52.65,
+      "TotalCharges": 2259.77,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000081",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 53,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Two year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 104.54,
+      "TotalCharges": 5634.92,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000082",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 61,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 117.95,
+      "TotalCharges": 7183.55,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000083",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 45,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 53.95,
+      "TotalCharges": 2437.58,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000084",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 22,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 87.56,
+      "TotalCharges": 1953.52,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000085",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 5,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 86.81,
+      "TotalCharges": 438.7,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000086",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 8,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 42.23,
+      "TotalCharges": 337.49,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000087",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 17,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "Yes",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 54.66,
+      "TotalCharges": 904.61,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000088",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 56,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 100.65,
+      "TotalCharges": 5627.61,
+      "Churn": 1
+    },
+    {
+      "customerID": "CUST_000089",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 6,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 87.5,
+      "TotalCharges": 533.01,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000090",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 9,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Bank transfer (automatic)",
+      "MonthlyCharges": 106.25,
+      "TotalCharges": 977.66,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000091",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 71,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "Yes",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 116.15,
+      "TotalCharges": 8317.08,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000092",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 29,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "No",
+      "OnlineSecurity": "No internet service",
+      "OnlineBackup": "No internet service",
+      "DeviceProtection": "No internet service",
+      "TechSupport": "No internet service",
+      "StreamingTV": "No internet service",
+      "StreamingMovies": "No internet service",
+      "Contract": "One year",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 59.81,
+      "TotalCharges": 1702.99,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000093",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 9,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "Yes",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 89.31,
+      "TotalCharges": 846.13,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000094",
+      "gender": "Female",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 63,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "Yes",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 108.08,
+      "TotalCharges": NaN,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000095",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "Yes",
+      "tenure": 70,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Mailed check",
+      "MonthlyCharges": 105.61,
+      "TotalCharges": 7399.77,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000096",
+      "gender": "Male",
+      "SeniorCitizen": 0,
+      "Partner": "Yes",
+      "Dependents": "No",
+      "tenure": 36,
+      "PhoneService": "Yes",
+      "MultipleLines": "Yes",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 68.24,
+      "TotalCharges": 2413.83,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000097",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 8,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "Yes",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 55.25,
+      "TotalCharges": 443.03,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000098",
+      "gender": "Female",
+      "SeniorCitizen": 0,
+      "Partner": "No",
+      "Dependents": "Yes",
+      "tenure": 45,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "DSL",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "No",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "No",
+      "Contract": "Month-to-month",
+      "PaperlessBilling": "No",
+      "PaymentMethod": "Electronic check",
+      "MonthlyCharges": 109.29,
+      "TotalCharges": 4917.35,
+      "Churn": 0
+    },
+    {
+      "customerID": "CUST_000099",
+      "gender": "Male",
+      "SeniorCitizen": 1,
+      "Partner": "No",
+      "Dependents": "No",
+      "tenure": 62,
+      "PhoneService": "Yes",
+      "MultipleLines": "No",
+      "InternetService": "Fiber optic",
+      "OnlineSecurity": "No",
+      "OnlineBackup": "No",
+      "DeviceProtection": "Yes",
+      "TechSupport": "No",
+      "StreamingTV": "No",
+      "StreamingMovies": "Yes",
+      "Contract": "One year",
+      "PaperlessBilling": "Yes",
+      "PaymentMethod": "Credit card (automatic)",
+      "MonthlyCharges": 111.23,
+      "TotalCharges": 6921.02,
+      "Churn": 0
+    }
+  ],
+  "cleaning_steps": [
+    {
+      "step": "Drop customerID",
+      "description": "Remove the customerID column \u2013 it is a unique identifier with zero predictive signal.",
+      "code": "df = df.drop(columns=['customerID'])"
+    },
+    {
+      "step": "Convert TotalCharges to numeric",
+      "description": "TotalCharges may contain whitespace strings for new customers (tenure=0). Coerce to float; these become NaN.",
+      "code": "df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')"
+    },
+    {
+      "step": "Impute missing TotalCharges",
+      "description": "Fill NaN TotalCharges with 0 for new customers whose tenure is 0, otherwise use median imputation.",
+      "code": "df['TotalCharges'] = df['TotalCharges'].fillna(df['TotalCharges'].median())"
+    },
+    {
+      "step": "Encode binary target",
+      "description": "Map Churn: 'Yes' \u2192 1, 'No' \u2192 0 (or keep as int if already numeric).",
+      "code": "if df['Churn'].dtype == object: df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})"
+    },
+    {
+      "step": "Label-encode categorical features",
+      "description": "Apply LabelEncoder to all object-dtype columns. This converts string categories to integer codes understood by tree models.",
+      "code": "for col in cat_cols: df[col] = LabelEncoder().fit_transform(df[col])"
+    },
+    {
+      "step": "Feature scaling (Logistic Regression only)",
+      "description": "StandardScaler (zero mean, unit variance) is applied to the feature matrix only for Logistic Regression. Tree-based models use raw integers.",
+      "code": "X_scaled = StandardScaler().fit_transform(X)"
+    }
+  ],
+  "models": {
+    "xgboost": {
+      "params": {
+        "n_estimators": 300,
+        "max_depth": 5,
+        "learning_rate": 0.08,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 3,
+        "gamma": 0.1,
+        "reg_alpha": 0.05,
+        "reg_lambda": 1.0,
+        "scale_pos_weight": 8.59,
+        "random_state": 42
+      },
+      "training_log": [
+        {
+          "round": 25,
+          "train_logloss": 0.67868,
+          "val_logloss": 0.68155
+        },
+        {
+          "round": 50,
+          "train_logloss": 0.66617,
+          "val_logloss": 0.67084
+        },
+        {
+          "round": 75,
+          "train_logloss": 0.65469,
+          "val_logloss": 0.66106
+        },
+        {
+          "round": 100,
+          "train_logloss": 0.64704,
+          "val_logloss": 0.65494
+        },
+        {
+          "round": 125,
+          "train_logloss": 0.63823,
+          "val_logloss": 0.64682
+        },
+        {
+          "round": 150,
+          "train_logloss": 0.63009,
+          "val_logloss": 0.63991
+        },
+        {
+          "round": 175,
+          "train_logloss": 0.62408,
+          "val_logloss": 0.63466
+        },
+        {
+          "round": 200,
+          "train_logloss": 0.61654,
+          "val_logloss": 0.62863
+        },
+        {
+          "round": 225,
+          "train_logloss": 0.61057,
+          "val_logloss": 0.62359
+        },
+        {
+          "round": 250,
+          "train_logloss": 0.60642,
+          "val_logloss": 0.6213
+        },
+        {
+          "round": 275,
+          "train_logloss": 0.60024,
+          "val_logloss": 0.61672
+        },
+        {
+          "round": 300,
+          "train_logloss": 0.59609,
+          "val_logloss": 0.61338
+        },
+        {
+          "round": 325,
+          "train_logloss": 0.59109,
+          "val_logloss": 0.60973
+        },
+        {
+          "round": 350,
+          "train_logloss": 0.58719,
+          "val_logloss": 0.6076
+        },
+        {
+          "round": 375,
+          "train_logloss": 0.5832,
+          "val_logloss": 0.60519
+        },
+        {
+          "round": 400,
+          "train_logloss": 0.57828,
+          "val_logloss": 0.60106
+        },
+        {
+          "round": 425,
+          "train_logloss": 0.57476,
+          "val_logloss": 0.59938
+        },
+        {
+          "round": 450,
+          "train_logloss": 0.57105,
+          "val_logloss": 0.59642
+        },
+        {
+          "round": 475,
+          "train_logloss": 0.56767,
+          "val_logloss": 0.59355
+        },
+        {
+          "round": 500,
+          "train_logloss": 0.56425,
+          "val_logloss": 0.59177
+        },
+        {
+          "round": 525,
+          "train_logloss": 0.56191,
+          "val_logloss": 0.59033
+        },
+        {
+          "round": 550,
+          "train_logloss": 0.55952,
+          "val_logloss": 0.58933
+        },
+        {
+          "round": 575,
+          "train_logloss": 0.55784,
+          "val_logloss": 0.58939
+        },
+        {
+          "round": 600,
+          "train_logloss": 0.5556,
+          "val_logloss": 0.5887
+        },
+        {
+          "round": 625,
+          "train_logloss": 0.55405,
+          "val_logloss": 0.58797
+        },
+        {
+          "round": 650,
+          "train_logloss": 0.55115,
+          "val_logloss": 0.58586
+        },
+        {
+          "round": 675,
+          "train_logloss": 0.54821,
+          "val_logloss": 0.58339
+        },
+        {
+          "round": 700,
+          "train_logloss": 0.5457,
+          "val_logloss": 0.58181
+        },
+        {
+          "round": 725,
+          "train_logloss": 0.54399,
+          "val_logloss": 0.58107
+        },
+        {
+          "round": 750,
+          "train_logloss": 0.54165,
+          "val_logloss": 0.58
+        },
+        {
+          "round": 775,
+          "train_logloss": 0.53959,
+          "val_logloss": 0.57918
+        },
+        {
+          "round": 800,
+          "train_logloss": 0.53765,
+          "val_logloss": 0.57765
+        },
+        {
+          "round": 825,
+          "train_logloss": 0.5364,
+          "val_logloss": 0.57689
+        },
+        {
+          "round": 850,
+          "train_logloss": 0.53418,
+          "val_logloss": 0.57615
+        },
+        {
+          "round": 875,
+          "train_logloss": 0.53106,
+          "val_logloss": 0.57349
+        },
+        {
+          "round": 900,
+          "train_logloss": 0.52882,
+          "val_logloss": 0.57243
+        },
+        {
+          "round": 925,
+          "train_logloss": 0.52604,
+          "val_logloss": 0.57074
+        },
+        {
+          "round": 950,
+          "train_logloss": 0.52537,
+          "val_logloss": 0.57054
+        },
+        {
+          "round": 975,
+          "train_logloss": 0.52425,
+          "val_logloss": 0.57027
+        },
+        {
+          "round": 1000,
+          "train_logloss": 0.5224,
+          "val_logloss": 0.56895
+        },
+        {
+          "round": 1025,
+          "train_logloss": 0.52065,
+          "val_logloss": 0.56851
+        },
+        {
+          "round": 1050,
+          "train_logloss": 0.51893,
+          "val_logloss": 0.56804
+        },
+        {
+          "round": 1075,
+          "train_logloss": 0.51768,
+          "val_logloss": 0.56722
+        },
+        {
+          "round": 1100,
+          "train_logloss": 0.51609,
+          "val_logloss": 0.56702
+        },
+        {
+          "round": 1125,
+          "train_logloss": 0.51533,
+          "val_logloss": 0.56673
+        },
+        {
+          "round": 1150,
+          "train_logloss": 0.51411,
+          "val_logloss": 0.56597
+        },
+        {
+          "round": 1175,
+          "train_logloss": 0.51272,
+          "val_logloss": 0.56536
+        },
+        {
+          "round": 1200,
+          "train_logloss": 0.51133,
+          "val_logloss": 0.56502
+        },
+        {
+          "round": 1225,
+          "train_logloss": 0.50955,
+          "val_logloss": 0.56417
+        },
+        {
+          "round": 1250,
+          "train_logloss": 0.50747,
+          "val_logloss": 0.56304
+        },
+        {
+          "round": 1275,
+          "train_logloss": 0.50596,
+          "val_logloss": 0.56247
+        },
+        {
+          "round": 1300,
+          "train_logloss": 0.50406,
+          "val_logloss": 0.56149
+        },
+        {
+          "round": 1325,
+          "train_logloss": 0.50365,
+          "val_logloss": 0.56176
+        },
+        {
+          "round": 1350,
+          "train_logloss": 0.50253,
+          "val_logloss": 0.56151
+        },
+        {
+          "round": 1375,
+          "train_logloss": 0.49903,
+          "val_logloss": 0.55932
+        },
+        {
+          "round": 1400,
+          "train_logloss": 0.49855,
+          "val_logloss": 0.55923
+        },
+        {
+          "round": 1425,
+          "train_logloss": 0.49759,
+          "val_logloss": 0.55849
+        },
+        {
+          "round": 1450,
+          "train_logloss": 0.49571,
+          "val_logloss": 0.55769
+        },
+        {
+          "round": 1475,
+          "train_logloss": 0.49453,
+          "val_logloss": 0.55784
+        },
+        {
+          "round": 1500,
+          "train_logloss": 0.49385,
+          "val_logloss": 0.55755
+        },
+        {
+          "round": 1525,
+          "train_logloss": 0.49236,
+          "val_logloss": 0.55653
+        },
+        {
+          "round": 1550,
+          "train_logloss": 0.48989,
+          "val_logloss": 0.55404
+        },
+        {
+          "round": 1575,
+          "train_logloss": 0.48813,
+          "val_logloss": 0.55341
+        },
+        {
+          "round": 1600,
+          "train_logloss": 0.48788,
+          "val_logloss": 0.55439
+        },
+        {
+          "round": 1625,
+          "train_logloss": 0.48726,
+          "val_logloss": 0.55505
+        },
+        {
+          "round": 1650,
+          "train_logloss": 0.48606,
+          "val_logloss": 0.55493
+        },
+        {
+          "round": 1675,
+          "train_logloss": 0.48469,
+          "val_logloss": 0.55423
+        },
+        {
+          "round": 1700,
+          "train_logloss": 0.48386,
+          "val_logloss": 0.554
+        },
+        {
+          "round": 1725,
+          "train_logloss": 0.48236,
+          "val_logloss": 0.55287
+        },
+        {
+          "round": 1750,
+          "train_logloss": 0.48071,
+          "val_logloss": 0.55171
+        },
+        {
+          "round": 1775,
+          "train_logloss": 0.47936,
+          "val_logloss": 0.55083
+        },
+        {
+          "round": 1800,
+          "train_logloss": 0.47799,
+          "val_logloss": 0.55036
+        },
+        {
+          "round": 1825,
+          "train_logloss": 0.47602,
+          "val_logloss": 0.54829
+        },
+        {
+          "round": 1850,
+          "train_logloss": 0.47426,
+          "val_logloss": 0.54755
+        },
+        {
+          "round": 1875,
+          "train_logloss": 0.47332,
+          "val_logloss": 0.54693
+        },
+        {
+          "round": 1900,
+          "train_logloss": 0.47229,
+          "val_logloss": 0.54655
+        },
+        {
+          "round": 1925,
+          "train_logloss": 0.47014,
+          "val_logloss": 0.54469
+        },
+        {
+          "round": 1950,
+          "train_logloss": 0.46822,
+          "val_logloss": 0.54326
+        },
+        {
+          "round": 1975,
+          "train_logloss": 0.46749,
+          "val_logloss": 0.54289
+        },
+        {
+          "round": 2000,
+          "train_logloss": 0.46634,
+          "val_logloss": 0.54214
+        },
+        {
+          "round": 2025,
+          "train_logloss": 0.46541,
+          "val_logloss": 0.54174
+        },
+        {
+          "round": 2050,
+          "train_logloss": 0.46552,
+          "val_logloss": 0.54197
+        },
+        {
+          "round": 2075,
+          "train_logloss": 0.4643,
+          "val_logloss": 0.54107
+        },
+        {
+          "round": 2100,
+          "train_logloss": 0.46264,
+          "val_logloss": 0.53982
+        },
+        {
+          "round": 2125,
+          "train_logloss": 0.46165,
+          "val_logloss": 0.53904
+        },
+        {
+          "round": 2150,
+          "train_logloss": 0.46045,
+          "val_logloss": 0.53844
+        },
+        {
+          "round": 2175,
+          "train_logloss": 0.46031,
+          "val_logloss": 0.53893
+        },
+        {
+          "round": 2200,
+          "train_logloss": 0.45855,
+          "val_logloss": 0.5381
+        },
+        {
+          "round": 2225,
+          "train_logloss": 0.45808,
+          "val_logloss": 0.53799
+        },
+        {
+          "round": 2250,
+          "train_logloss": 0.45729,
+          "val_logloss": 0.53794
+        },
+        {
+          "round": 2275,
+          "train_logloss": 0.45689,
+          "val_logloss": 0.53801
+        },
+        {
+          "round": 2300,
+          "train_logloss": 0.45576,
+          "val_logloss": 0.53702
+        },
+        {
+          "round": 2325,
+          "train_logloss": 0.45423,
+          "val_logloss": 0.53604
+        },
+        {
+          "round": 2350,
+          "train_logloss": 0.45281,
+          "val_logloss": 0.53541
+        },
+        {
+          "round": 2375,
+          "train_logloss": 0.45166,
+          "val_logloss": 0.5346
+        },
+        {
+          "round": 2400,
+          "train_logloss": 0.44972,
+          "val_logloss": 0.5334
+        },
+        {
+          "round": 2425,
+          "train_logloss": 0.44999,
+          "val_logloss": 0.53364
+        },
+        {
+          "round": 2450,
+          "train_logloss": 0.44913,
+          "val_logloss": 0.53327
+        },
+        {
+          "round": 2475,
+          "train_logloss": 0.44865,
+          "val_logloss": 0.533
+        },
+        {
+          "round": 2500,
+          "train_logloss": 0.44669,
+          "val_logloss": 0.53156
+        },
+        {
+          "round": 2525,
+          "train_logloss": 0.4457,
+          "val_logloss": 0.53093
+        },
+        {
+          "round": 2550,
+          "train_logloss": 0.44568,
+          "val_logloss": 0.53124
+        },
+        {
+          "round": 2575,
+          "train_logloss": 0.44475,
+          "val_logloss": 0.53105
+        },
+        {
+          "round": 2600,
+          "train_logloss": 0.44464,
+          "val_logloss": 0.5314
+        },
+        {
+          "round": 2625,
+          "train_logloss": 0.44489,
+          "val_logloss": 0.53163
+        },
+        {
+          "round": 2650,
+          "train_logloss": 0.44196,
+          "val_logloss": 0.52942
+        },
+        {
+          "round": 2675,
+          "train_logloss": 0.4406,
+          "val_logloss": 0.52818
+        },
+        {
+          "round": 2700,
+          "train_logloss": 0.43874,
+          "val_logloss": 0.52697
+        },
+        {
+          "round": 2725,
+          "train_logloss": 0.43734,
+          "val_logloss": 0.52677
+        },
+        {
+          "round": 2750,
+          "train_logloss": 0.43592,
+          "val_logloss": 0.52598
+        },
+        {
+          "round": 2775,
+          "train_logloss": 0.43467,
+          "val_logloss": 0.52504
+        },
+        {
+          "round": 2800,
+          "train_logloss": 0.43349,
+          "val_logloss": 0.52462
+        },
+        {
+          "round": 2825,
+          "train_logloss": 0.4329,
+          "val_logloss": 0.52464
+        },
+        {
+          "round": 2850,
+          "train_logloss": 0.43207,
+          "val_logloss": 0.52453
+        },
+        {
+          "round": 2875,
+          "train_logloss": 0.43129,
+          "val_logloss": 0.5243
+        },
+        {
+          "round": 2900,
+          "train_logloss": 0.43092,
+          "val_logloss": 0.52405
+        },
+        {
+          "round": 2925,
+          "train_logloss": 0.42924,
+          "val_logloss": 0.52311
+        },
+        {
+          "round": 2950,
+          "train_logloss": 0.42828,
+          "val_logloss": 0.52278
+        },
+        {
+          "round": 2975,
+          "train_logloss": 0.42813,
+          "val_logloss": 0.52288
+        },
+        {
+          "round": 3000,
+          "train_logloss": 0.42737,
+          "val_logloss": 0.52298
+        },
+        {
+          "round": 3025,
+          "train_logloss": 0.42677,
+          "val_logloss": 0.52276
+        },
+        {
+          "round": 3050,
+          "train_logloss": 0.427,
+          "val_logloss": 0.5232
+        },
+        {
+          "round": 3075,
+          "train_logloss": 0.42583,
+          "val_logloss": 0.52269
+        },
+        {
+          "round": 3100,
+          "train_logloss": 0.42488,
+          "val_logloss": 0.52215
+        },
+        {
+          "round": 3125,
+          "train_logloss": 0.42442,
+          "val_logloss": 0.52236
+        },
+        {
+          "round": 3150,
+          "train_logloss": 0.42329,
+          "val_logloss": 0.52192
+        },
+        {
+          "round": 3175,
+          "train_logloss": 0.42282,
+          "val_logloss": 0.52206
+        },
+        {
+          "round": 3200,
+          "train_logloss": 0.42219,
+          "val_logloss": 0.52193
+        },
+        {
+          "round": 3225,
+          "train_logloss": 0.422,
+          "val_logloss": 0.52174
+        },
+        {
+          "round": 3250,
+          "train_logloss": 0.42078,
+          "val_logloss": 0.52081
+        },
+        {
+          "round": 3275,
+          "train_logloss": 0.42008,
+          "val_logloss": 0.52021
+        },
+        {
+          "round": 3300,
+          "train_logloss": 0.41875,
+          "val_logloss": 0.51942
+        },
+        {
+          "round": 3325,
+          "train_logloss": 0.41798,
+          "val_logloss": 0.51904
+        },
+        {
+          "round": 3350,
+          "train_logloss": 0.41617,
+          "val_logloss": 0.51844
+        },
+        {
+          "round": 3375,
+          "train_logloss": 0.41499,
+          "val_logloss": 0.51765
+        },
+        {
+          "round": 3400,
+          "train_logloss": 0.41442,
+          "val_logloss": 0.51733
+        },
+        {
+          "round": 3425,
+          "train_logloss": 0.41332,
+          "val_logloss": 0.51693
+        },
+        {
+          "round": 3450,
+          "train_logloss": 0.41264,
+          "val_logloss": 0.51661
+        },
+        {
+          "round": 3475,
+          "train_logloss": 0.41134,
+          "val_logloss": 0.51559
+        },
+        {
+          "round": 3500,
+          "train_logloss": 0.41053,
+          "val_logloss": 0.51534
+        },
+        {
+          "round": 3525,
+          "train_logloss": 0.41102,
+          "val_logloss": 0.51592
+        },
+        {
+          "round": 3550,
+          "train_logloss": 0.41026,
+          "val_logloss": 0.51581
+        },
+        {
+          "round": 3575,
+          "train_logloss": 0.4096,
+          "val_logloss": 0.51499
+        },
+        {
+          "round": 3600,
+          "train_logloss": 0.40823,
+          "val_logloss": 0.51414
+        },
+        {
+          "round": 3625,
+          "train_logloss": 0.4077,
+          "val_logloss": 0.5138
+        },
+        {
+          "round": 3650,
+          "train_logloss": 0.40682,
+          "val_logloss": 0.51365
+        },
+        {
+          "round": 3675,
+          "train_logloss": 0.40662,
+          "val_logloss": 0.51377
+        },
+        {
+          "round": 3700,
+          "train_logloss": 0.40655,
+          "val_logloss": 0.514
+        },
+        {
+          "round": 3725,
+          "train_logloss": 0.40549,
+          "val_logloss": 0.51355
+        },
+        {
+          "round": 3750,
+          "train_logloss": 0.4051,
+          "val_logloss": 0.51344
+        },
+        {
+          "round": 3775,
+          "train_logloss": 0.40322,
+          "val_logloss": 0.51279
+        },
+        {
+          "round": 3800,
+          "train_logloss": 0.40321,
+          "val_logloss": 0.51301
+        },
+        {
+          "round": 3825,
+          "train_logloss": 0.4026,
+          "val_logloss": 0.513
+        },
+        {
+          "round": 3850,
+          "train_logloss": 0.40284,
+          "val_logloss": 0.51337
+        },
+        {
+          "round": 3875,
+          "train_logloss": 0.40123,
+          "val_logloss": 0.51283
+        },
+        {
+          "round": 3900,
+          "train_logloss": 0.40006,
+          "val_logloss": 0.51197
+        },
+        {
+          "round": 3925,
+          "train_logloss": 0.3998,
+          "val_logloss": 0.51214
+        },
+        {
+          "round": 3950,
+          "train_logloss": 0.39969,
+          "val_logloss": 0.51218
+        },
+        {
+          "round": 3975,
+          "train_logloss": 0.39906,
+          "val_logloss": 0.5117
+        },
+        {
+          "round": 4000,
+          "train_logloss": 0.3986,
+          "val_logloss": 0.51115
+        },
+        {
+          "round": 4025,
+          "train_logloss": 0.39807,
+          "val_logloss": 0.51141
+        },
+        {
+          "round": 4050,
+          "train_logloss": 0.39735,
+          "val_logloss": 0.51124
+        },
+        {
+          "round": 4075,
+          "train_logloss": 0.39611,
+          "val_logloss": 0.51036
+        },
+        {
+          "round": 4100,
+          "train_logloss": 0.39505,
+          "val_logloss": 0.50912
+        },
+        {
+          "round": 4125,
+          "train_logloss": 0.39491,
+          "val_logloss": 0.50924
+        },
+        {
+          "round": 4150,
+          "train_logloss": 0.39373,
+          "val_logloss": 0.50825
+        },
+        {
+          "round": 4175,
+          "train_logloss": 0.39247,
+          "val_logloss": 0.50766
+        },
+        {
+          "round": 4200,
+          "train_logloss": 0.39239,
+          "val_logloss": 0.50783
+        },
+        {
+          "round": 4225,
+          "train_logloss": 0.39158,
+          "val_logloss": 0.50751
+        },
+        {
+          "round": 4250,
+          "train_logloss": 0.3917,
+          "val_logloss": 0.50807
+        },
+        {
+          "round": 4275,
+          "train_logloss": 0.39086,
+          "val_logloss": 0.50818
+        },
+        {
+          "round": 4300,
+          "train_logloss": 0.39023,
+          "val_logloss": 0.50845
+        },
+        {
+          "round": 4325,
+          "train_logloss": 0.38917,
+          "val_logloss": 0.50779
+        },
+        {
+          "round": 4350,
+          "train_logloss": 0.3881,
+          "val_logloss": 0.50726
+        },
+        {
+          "round": 4375,
+          "train_logloss": 0.38715,
+          "val_logloss": 0.50705
+        },
+        {
+          "round": 4400,
+          "train_logloss": 0.38572,
+          "val_logloss": 0.50635
+        },
+        {
+          "round": 4425,
+          "train_logloss": 0.38476,
+          "val_logloss": 0.50566
+        },
+        {
+          "round": 4450,
+          "train_logloss": 0.38344,
+          "val_logloss": 0.50535
+        },
+        {
+          "round": 4475,
+          "train_logloss": 0.38231,
+          "val_logloss": 0.5044
+        },
+        {
+          "round": 4500,
+          "train_logloss": 0.38048,
+          "val_logloss": 0.5033
+        },
+        {
+          "round": 4525,
+          "train_logloss": 0.37904,
+          "val_logloss": 0.50251
+        },
+        {
+          "round": 4550,
+          "train_logloss": 0.37842,
+          "val_logloss": 0.50241
+        },
+        {
+          "round": 4575,
+          "train_logloss": 0.37761,
+          "val_logloss": 0.50214
+        },
+        {
+          "round": 4600,
+          "train_logloss": 0.37608,
+          "val_logloss": 0.50109
+        },
+        {
+          "round": 4625,
+          "train_logloss": 0.37498,
+          "val_logloss": 0.50055
+        },
+        {
+          "round": 4650,
+          "train_logloss": 0.37373,
+          "val_logloss": 0.49991
+        },
+        {
+          "round": 4675,
+          "train_logloss": 0.3733,
+          "val_logloss": 0.49985
+        },
+        {
+          "round": 4700,
+          "train_logloss": 0.37186,
+          "val_logloss": 0.4995
+        },
+        {
+          "round": 4725,
+          "train_logloss": 0.37171,
+          "val_logloss": 0.49969
+        },
+        {
+          "round": 4750,
+          "train_logloss": 0.37062,
+          "val_logloss": 0.499
+        },
+        {
+          "round": 4775,
+          "train_logloss": 0.36996,
+          "val_logloss": 0.49865
+        },
+        {
+          "round": 4800,
+          "train_logloss": 0.36916,
+          "val_logloss": 0.49799
+        },
+        {
+          "round": 4825,
+          "train_logloss": 0.36821,
+          "val_logloss": 0.49721
+        },
+        {
+          "round": 4850,
+          "train_logloss": 0.36787,
+          "val_logloss": 0.49732
+        },
+        {
+          "round": 4875,
+          "train_logloss": 0.36683,
+          "val_logloss": 0.49726
+        },
+        {
+          "round": 4900,
+          "train_logloss": 0.36649,
+          "val_logloss": 0.4972
+        },
+        {
+          "round": 4925,
+          "train_logloss": 0.3661,
+          "val_logloss": 0.49704
+        },
+        {
+          "round": 4950,
+          "train_logloss": 0.36578,
+          "val_logloss": 0.49677
+        },
+        {
+          "round": 4975,
+          "train_logloss": 0.36521,
+          "val_logloss": 0.49679
+        },
+        {
+          "round": 5000,
+          "train_logloss": 0.36455,
+          "val_logloss": 0.49639
+        },
+        {
+          "round": 5025,
+          "train_logloss": 0.36353,
+          "val_logloss": 0.4956
+        },
+        {
+          "round": 5050,
+          "train_logloss": 0.36338,
+          "val_logloss": 0.49596
+        },
+        {
+          "round": 5075,
+          "train_logloss": 0.36262,
+          "val_logloss": 0.49544
+        },
+        {
+          "round": 5100,
+          "train_logloss": 0.36153,
+          "val_logloss": 0.49537
+        },
+        {
+          "round": 5125,
+          "train_logloss": 0.36132,
+          "val_logloss": 0.49559
+        },
+        {
+          "round": 5150,
+          "train_logloss": 0.36087,
+          "val_logloss": 0.49533
+        },
+        {
+          "round": 5175,
+          "train_logloss": 0.36023,
+          "val_logloss": 0.49499
+        },
+        {
+          "round": 5200,
+          "train_logloss": 0.35914,
+          "val_logloss": 0.49439
+        },
+        {
+          "round": 5225,
+          "train_logloss": 0.35877,
+          "val_logloss": 0.49461
+        },
+        {
+          "round": 5250,
+          "train_logloss": 0.35829,
+          "val_logloss": 0.49459
+        },
+        {
+          "round": 5275,
+          "train_logloss": 0.35711,
+          "val_logloss": 0.49415
+        },
+        {
+          "round": 5300,
+          "train_logloss": 0.35649,
+          "val_logloss": 0.49374
+        },
+        {
+          "round": 5325,
+          "train_logloss": 0.35567,
+          "val_logloss": 0.49299
+        },
+        {
+          "round": 5350,
+          "train_logloss": 0.35507,
+          "val_logloss": 0.49298
+        },
+        {
+          "round": 5375,
+          "train_logloss": 0.35412,
+          "val_logloss": 0.49228
+        },
+        {
+          "round": 5400,
+          "train_logloss": 0.35373,
+          "val_logloss": 0.49245
+        },
+        {
+          "round": 5425,
+          "train_logloss": 0.35296,
+          "val_logloss": 0.49217
+        },
+        {
+          "round": 5450,
+          "train_logloss": 0.35298,
+          "val_logloss": 0.49265
+        },
+        {
+          "round": 5475,
+          "train_logloss": 0.35239,
+          "val_logloss": 0.49283
+        },
+        {
+          "round": 5500,
+          "train_logloss": 0.35123,
+          "val_logloss": 0.49227
+        },
+        {
+          "round": 5525,
+          "train_logloss": 0.35044,
+          "val_logloss": 0.4916
+        },
+        {
+          "round": 5550,
+          "train_logloss": 0.3491,
+          "val_logloss": 0.49133
+        },
+        {
+          "round": 5575,
+          "train_logloss": 0.34817,
+          "val_logloss": 0.49101
+        },
+        {
+          "round": 5600,
+          "train_logloss": 0.34708,
+          "val_logloss": 0.49021
+        },
+        {
+          "round": 5625,
+          "train_logloss": 0.3466,
+          "val_logloss": 0.48976
+        },
+        {
+          "round": 5650,
+          "train_logloss": 0.34573,
+          "val_logloss": 0.48893
+        },
+        {
+          "round": 5675,
+          "train_logloss": 0.34476,
+          "val_logloss": 0.4886
+        },
+        {
+          "round": 5700,
+          "train_logloss": 0.3445,
+          "val_logloss": 0.48883
+        },
+        {
+          "round": 5725,
+          "train_logloss": 0.34419,
+          "val_logloss": 0.48916
+        },
+        {
+          "round": 5750,
+          "train_logloss": 0.34346,
+          "val_logloss": 0.48885
+        },
+        {
+          "round": 5775,
+          "train_logloss": 0.34319,
+          "val_logloss": 0.4888
+        },
+        {
+          "round": 5800,
+          "train_logloss": 0.34187,
+          "val_logloss": 0.48782
+        },
+        {
+          "round": 5825,
+          "train_logloss": 0.34145,
+          "val_logloss": 0.4876
+        },
+        {
+          "round": 5850,
+          "train_logloss": 0.34073,
+          "val_logloss": 0.48744
+        },
+        {
+          "round": 5875,
+          "train_logloss": 0.33984,
+          "val_logloss": 0.48673
+        },
+        {
+          "round": 5900,
+          "train_logloss": 0.33883,
+          "val_logloss": 0.48638
+        },
+        {
+          "round": 5925,
+          "train_logloss": 0.33939,
+          "val_logloss": 0.48691
+        },
+        {
+          "round": 5950,
+          "train_logloss": 0.33825,
+          "val_logloss": 0.48622
+        },
+        {
+          "round": 5975,
+          "train_logloss": 0.33757,
+          "val_logloss": 0.48582
+        },
+        {
+          "round": 6000,
+          "train_logloss": 0.3374,
+          "val_logloss": 0.48583
+        },
+        {
+          "round": 6025,
+          "train_logloss": 0.33737,
+          "val_logloss": 0.48604
+        },
+        {
+          "round": 6050,
+          "train_logloss": 0.33654,
+          "val_logloss": 0.48584
+        },
+        {
+          "round": 6075,
+          "train_logloss": 0.33642,
+          "val_logloss": 0.48574
+        },
+        {
+          "round": 6100,
+          "train_logloss": 0.33627,
+          "val_logloss": 0.48607
+        },
+        {
+          "round": 6125,
+          "train_logloss": 0.33554,
+          "val_logloss": 0.48583
+        },
+        {
+          "round": 6150,
+          "train_logloss": 0.33518,
+          "val_logloss": 0.48596
+        },
+        {
+          "round": 6175,
+          "train_logloss": 0.33441,
+          "val_logloss": 0.4857
+        },
+        {
+          "round": 6200,
+          "train_logloss": 0.3338,
+          "val_logloss": 0.48575
+        },
+        {
+          "round": 6225,
+          "train_logloss": 0.33312,
+          "val_logloss": 0.48544
+        },
+        {
+          "round": 6250,
+          "train_logloss": 0.33209,
+          "val_logloss": 0.4853
+        },
+        {
+          "round": 6275,
+          "train_logloss": 0.33154,
+          "val_logloss": 0.48514
+        },
+        {
+          "round": 6300,
+          "train_logloss": 0.33087,
+          "val_logloss": 0.48483
+        },
+        {
+          "round": 6325,
+          "train_logloss": 0.32994,
+          "val_logloss": 0.48413
+        },
+        {
+          "round": 6350,
+          "train_logloss": 0.32928,
+          "val_logloss": 0.484
+        },
+        {
+          "round": 6375,
+          "train_logloss": 0.32846,
+          "val_logloss": 0.48331
+        },
+        {
+          "round": 6400,
+          "train_logloss": 0.32857,
+          "val_logloss": 0.48404
+        },
+        {
+          "round": 6425,
+          "train_logloss": 0.32777,
+          "val_logloss": 0.48353
+        },
+        {
+          "round": 6450,
+          "train_logloss": 0.32742,
+          "val_logloss": 0.48342
+        },
+        {
+          "round": 6475,
+          "train_logloss": 0.32644,
+          "val_logloss": 0.48297
+        },
+        {
+          "round": 6500,
+          "train_logloss": 0.32532,
+          "val_logloss": 0.4824
+        },
+        {
+          "round": 6525,
+          "train_logloss": 0.32412,
+          "val_logloss": 0.48163
+        },
+        {
+          "round": 6550,
+          "train_logloss": 0.32318,
+          "val_logloss": 0.4814
+        },
+        {
+          "round": 6575,
+          "train_logloss": 0.32274,
+          "val_logloss": 0.48125
+        },
+        {
+          "round": 6600,
+          "train_logloss": 0.32203,
+          "val_logloss": 0.48118
+        },
+        {
+          "round": 6625,
+          "train_logloss": 0.32152,
+          "val_logloss": 0.48094
+        },
+        {
+          "round": 6650,
+          "train_logloss": 0.32025,
+          "val_logloss": 0.47995
+        },
+        {
+          "round": 6675,
+          "train_logloss": 0.31966,
+          "val_logloss": 0.47985
+        },
+        {
+          "round": 6700,
+          "train_logloss": 0.31974,
+          "val_logloss": 0.48013
+        },
+        {
+          "round": 6725,
+          "train_logloss": 0.31883,
+          "val_logloss": 0.48033
+        },
+        {
+          "round": 6750,
+          "train_logloss": 0.31833,
+          "val_logloss": 0.48022
+        },
+        {
+          "round": 6775,
+          "train_logloss": 0.31746,
+          "val_logloss": 0.47967
+        },
+        {
+          "round": 6800,
+          "train_logloss": 0.31646,
+          "val_logloss": 0.47884
+        },
+        {
+          "round": 6825,
+          "train_logloss": 0.31617,
+          "val_logloss": 0.47867
+        },
+        {
+          "round": 6850,
+          "train_logloss": 0.316,
+          "val_logloss": 0.47914
+        },
+        {
+          "round": 6875,
+          "train_logloss": 0.31492,
+          "val_logloss": 0.47881
+        },
+        {
+          "round": 6900,
+          "train_logloss": 0.31449,
+          "val_logloss": 0.47858
+        },
+        {
+          "round": 6925,
+          "train_logloss": 0.31363,
+          "val_logloss": 0.47787
+        },
+        {
+          "round": 6950,
+          "train_logloss": 0.31282,
+          "val_logloss": 0.47736
+        },
+        {
+          "round": 6975,
+          "train_logloss": 0.31203,
+          "val_logloss": 0.47693
+        },
+        {
+          "round": 7000,
+          "train_logloss": 0.31142,
+          "val_logloss": 0.47674
+        },
+        {
+          "round": 7025,
+          "train_logloss": 0.31122,
+          "val_logloss": 0.47671
+        },
+        {
+          "round": 7050,
+          "train_logloss": 0.3105,
+          "val_logloss": 0.47627
+        },
+        {
+          "round": 7075,
+          "train_logloss": 0.30984,
+          "val_logloss": 0.47613
+        },
+        {
+          "round": 7100,
+          "train_logloss": 0.30932,
+          "val_logloss": 0.47604
+        },
+        {
+          "round": 7125,
+          "train_logloss": 0.30886,
+          "val_logloss": 0.47582
+        },
+        {
+          "round": 7150,
+          "train_logloss": 0.30851,
+          "val_logloss": 0.47562
+        },
+        {
+          "round": 7175,
+          "train_logloss": 0.30826,
+          "val_logloss": 0.47568
+        },
+        {
+          "round": 7200,
+          "train_logloss": 0.3075,
+          "val_logloss": 0.47542
+        },
+        {
+          "round": 7225,
+          "train_logloss": 0.30675,
+          "val_logloss": 0.47502
+        },
+        {
+          "round": 7250,
+          "train_logloss": 0.30637,
+          "val_logloss": 0.47497
+        },
+        {
+          "round": 7275,
+          "train_logloss": 0.30632,
+          "val_logloss": 0.47515
+        },
+        {
+          "round": 7300,
+          "train_logloss": 0.30601,
+          "val_logloss": 0.47518
+        },
+        {
+          "round": 7325,
+          "train_logloss": 0.30483,
+          "val_logloss": 0.47454
+        },
+        {
+          "round": 7350,
+          "train_logloss": 0.30411,
+          "val_logloss": 0.4738
+        },
+        {
+          "round": 7375,
+          "train_logloss": 0.30363,
+          "val_logloss": 0.47373
+        },
+        {
+          "round": 7400,
+          "train_logloss": 0.30294,
+          "val_logloss": 0.47332
+        },
+        {
+          "round": 7425,
+          "train_logloss": 0.302,
+          "val_logloss": 0.47267
+        },
+        {
+          "round": 7450,
+          "train_logloss": 0.30127,
+          "val_logloss": 0.47191
+        },
+        {
+          "round": 7475,
+          "train_logloss": 0.30045,
+          "val_logloss": 0.47162
+        },
+        {
+          "round": 7500,
+          "train_logloss": 0.2997,
+          "val_logloss": 0.47118
+        }
+      ],
+      "feature_importance": [
+        {
+          "feature": "Contract",
+          "importance": 0.08982
+        },
+        {
+          "feature": "tenure",
+          "importance": 0.07265
+        },
+        {
+          "feature": "MonthlyCharges",
+          "importance": 0.06033
+        },
+        {
+          "feature": "InternetService",
+          "importance": 0.05792
+        },
+        {
+          "feature": "OnlineSecurity",
+          "importance": 0.0574
+        },
+        {
+          "feature": "PaymentMethod",
+          "importance": 0.05462
+        },
+        {
+          "feature": "TotalCharges",
+          "importance": 0.05231
+        },
+        {
+          "feature": "StreamingMovies",
+          "importance": 0.05112
+        },
+        {
+          "feature": "PhoneService",
+          "importance": 0.05106
+        },
+        {
+          "feature": "TechSupport",
+          "importance": 0.04912
+        },
+        {
+          "feature": "StreamingTV",
+          "importance": 0.0491
+        },
+        {
+          "feature": "SeniorCitizen",
+          "importance": 0.04838
+        },
+        {
+          "feature": "DeviceProtection",
+          "importance": 0.04629
+        },
+        {
+          "feature": "PaperlessBilling",
+          "importance": 0.04621
+        },
+        {
+          "feature": "OnlineBackup",
+          "importance": 0.04574
+        },
+        {
+          "feature": "gender",
+          "importance": 0.04325
+        },
+        {
+          "feature": "Partner",
+          "importance": 0.04238
+        },
+        {
+          "feature": "MultipleLines",
+          "importance": 0.04176
+        },
+        {
+          "feature": "Dependents",
+          "importance": 0.04055
+        }
+      ],
+      "metrics": {
+        "accuracy": 0.775,
+        "precision": 0.1929,
+        "recall": 0.3654,
+        "f1": 0.2525,
+        "roc_auc": 0.6547,
+        "log_loss": 0.4712,
+        "confusion_matrix": [
+          [
+            1474,
+            318
+          ],
+          [
+            132,
+            76
+          ]
+        ],
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0045,
+            0.0167,
+            0.0179,
+            0.0218,
+            0.0234,
+            0.0312,
+            0.0335,
+            0.0413,
+            0.0441,
+            0.0485,
+            0.0608,
+            0.0658,
+            0.0709,
+            0.0843,
+            0.0887,
+            0.0926,
+            0.0965,
+            0.0993,
+            0.1071,
+            0.12,
+            0.1261,
+            0.1356,
+            0.1401,
+            0.1669,
+            0.1735,
+            0.1819,
+            0.1931,
+            0.2081,
+            0.2143,
+            0.2266,
+            0.2455,
+            0.2506,
+            0.2539,
+            0.2561,
+            0.2628,
+            0.303,
+            0.3075,
+            0.3147,
+            0.3304,
+            0.361,
+            0.3717,
+            0.385,
+            0.4051,
+            0.428,
+            0.4302,
+            0.4408,
+            0.4442,
+            0.4503,
+            0.4732,
+            0.49,
+            0.5106,
+            0.5446,
+            0.5603,
+            0.5692,
+            0.5898,
+            0.5965,
+            0.6055,
+            0.6328,
+            0.6367,
+            0.6579,
+            0.6713,
+            0.7065,
+            0.7104,
+            0.7288,
+            0.7416,
+            0.7662,
+            0.7729,
+            0.808,
+            0.8504,
+            0.8862,
+            0.894,
+            0.9358,
+            0.9648
+          ],
+          "tpr": [
+            0.0,
+            0.0144,
+            0.024,
+            0.0481,
+            0.0625,
+            0.0817,
+            0.101,
+            0.1154,
+            0.125,
+            0.1394,
+            0.1538,
+            0.1683,
+            0.1779,
+            0.1923,
+            0.2067,
+            0.226,
+            0.2356,
+            0.25,
+            0.2596,
+            0.274,
+            0.2885,
+            0.3029,
+            0.3173,
+            0.3317,
+            0.3413,
+            0.3606,
+            0.3702,
+            0.3846,
+            0.3942,
+            0.4087,
+            0.4183,
+            0.4327,
+            0.4471,
+            0.4663,
+            0.4808,
+            0.4952,
+            0.5096,
+            0.524,
+            0.5337,
+            0.5481,
+            0.5577,
+            0.5769,
+            0.5913,
+            0.6106,
+            0.6202,
+            0.6346,
+            0.649,
+            0.6635,
+            0.6779,
+            0.6971,
+            0.7067,
+            0.7212,
+            0.7308,
+            0.7452,
+            0.7548,
+            0.774,
+            0.7837,
+            0.7981,
+            0.8077,
+            0.8221,
+            0.8317,
+            0.8462,
+            0.8558,
+            0.8702,
+            0.8798,
+            0.8942,
+            0.9038,
+            0.9231,
+            0.9327,
+            0.9471,
+            0.9567,
+            0.9712,
+            0.9808,
+            0.9952
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0453,
+            0.1479,
+            0.246,
+            0.3493,
+            0.4442,
+            0.5478,
+            0.6394,
+            0.7473,
+            0.8382,
+            0.9239
+          ],
+          "fraction_positive": [
+            0.0523,
+            0.0791,
+            0.1151,
+            0.0777,
+            0.1484,
+            0.1298,
+            0.2083,
+            0.2135,
+            0.3111,
+            0.1111
+          ]
+        }
+      }
+    },
+    "logistic_regression": {
+      "params": {
+        "C": 1.0,
+        "max_iter": 1000,
+        "solver": "lbfgs",
+        "class_weight": "balanced",
+        "random_state": 42
+      },
+      "metrics": {
+        "accuracy": 0.654,
+        "precision": 0.1799,
+        "recall": 0.6538,
+        "f1": 0.2822,
+        "roc_auc": 0.719,
+        "log_loss": 0.6145,
+        "confusion_matrix": [
+          [
+            1172,
+            620
+          ],
+          [
+            72,
+            136
+          ]
+        ],
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0112,
+            0.0145,
+            0.0173,
+            0.0223,
+            0.024,
+            0.0296,
+            0.0324,
+            0.0363,
+            0.0413,
+            0.048,
+            0.0513,
+            0.0625,
+            0.0753,
+            0.0798,
+            0.082,
+            0.0876,
+            0.0898,
+            0.0943,
+            0.0993,
+            0.1183,
+            0.1205,
+            0.1239,
+            0.1311,
+            0.1345,
+            0.1423,
+            0.1468,
+            0.149,
+            0.1685,
+            0.1708,
+            0.1836,
+            0.192,
+            0.2009,
+            0.2098,
+            0.2132,
+            0.2299,
+            0.2561,
+            0.2662,
+            0.2785,
+            0.2801,
+            0.2879,
+            0.2974,
+            0.3041,
+            0.3181,
+            0.3348,
+            0.3549,
+            0.3711,
+            0.3884,
+            0.4174,
+            0.4213,
+            0.4314,
+            0.4436,
+            0.4626,
+            0.4699,
+            0.4849,
+            0.4922,
+            0.5156,
+            0.5184,
+            0.5368,
+            0.553,
+            0.5776,
+            0.6055,
+            0.644,
+            0.6607,
+            0.6892,
+            0.7003,
+            0.7305,
+            0.7578,
+            0.7829,
+            0.8103,
+            0.8873
+          ],
+          "tpr": [
+            0.0,
+            0.0096,
+            0.0192,
+            0.0337,
+            0.0481,
+            0.0769,
+            0.0962,
+            0.1154,
+            0.1346,
+            0.149,
+            0.1683,
+            0.1875,
+            0.2019,
+            0.2163,
+            0.2308,
+            0.2452,
+            0.2548,
+            0.2692,
+            0.2837,
+            0.3029,
+            0.3173,
+            0.3365,
+            0.3462,
+            0.3654,
+            0.375,
+            0.3942,
+            0.4038,
+            0.4183,
+            0.4279,
+            0.4471,
+            0.4567,
+            0.476,
+            0.4856,
+            0.5,
+            0.5096,
+            0.524,
+            0.5337,
+            0.5481,
+            0.5577,
+            0.5769,
+            0.5913,
+            0.6154,
+            0.625,
+            0.6394,
+            0.649,
+            0.6635,
+            0.6731,
+            0.6923,
+            0.7067,
+            0.7212,
+            0.7308,
+            0.7452,
+            0.7596,
+            0.7788,
+            0.7885,
+            0.8029,
+            0.8125,
+            0.8269,
+            0.8365,
+            0.8558,
+            0.8654,
+            0.8798,
+            0.8942,
+            0.9087,
+            0.9183,
+            0.9327,
+            0.9423,
+            0.9567,
+            0.9663,
+            0.9808,
+            0.9904
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0842,
+            0.1585,
+            0.2512,
+            0.3494,
+            0.4518,
+            0.5494,
+            0.6505,
+            0.7456,
+            0.838
+          ],
+          "fraction_positive": [
+            0.0,
+            0.0199,
+            0.0333,
+            0.0651,
+            0.1074,
+            0.119,
+            0.1903,
+            0.2548,
+            0.2581
+          ]
+        }
+      }
+    },
+    "random_forest": {
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 10,
+        "min_samples_split": 5,
+        "min_samples_leaf": 2,
+        "class_weight": "balanced",
+        "random_state": 42
+      },
+      "feature_importance": [
+        {
+          "feature": "MonthlyCharges",
+          "importance": 0.21121
+        },
+        {
+          "feature": "tenure",
+          "importance": 0.2106
+        },
+        {
+          "feature": "TotalCharges",
+          "importance": 0.16705
+        },
+        {
+          "feature": "Contract",
+          "importance": 0.06269
+        },
+        {
+          "feature": "PaymentMethod",
+          "importance": 0.05019
+        },
+        {
+          "feature": "OnlineSecurity",
+          "importance": 0.02773
+        },
+        {
+          "feature": "MultipleLines",
+          "importance": 0.02728
+        },
+        {
+          "feature": "InternetService",
+          "importance": 0.02619
+        },
+        {
+          "feature": "DeviceProtection",
+          "importance": 0.02253
+        },
+        {
+          "feature": "StreamingMovies",
+          "importance": 0.02224
+        },
+        {
+          "feature": "OnlineBackup",
+          "importance": 0.02168
+        },
+        {
+          "feature": "StreamingTV",
+          "importance": 0.02147
+        },
+        {
+          "feature": "TechSupport",
+          "importance": 0.02125
+        },
+        {
+          "feature": "gender",
+          "importance": 0.02099
+        },
+        {
+          "feature": "PaperlessBilling",
+          "importance": 0.02035
+        },
+        {
+          "feature": "Partner",
+          "importance": 0.0194
+        },
+        {
+          "feature": "Dependents",
+          "importance": 0.01935
+        },
+        {
+          "feature": "SeniorCitizen",
+          "importance": 0.01565
+        },
+        {
+          "feature": "PhoneService",
+          "importance": 0.01215
+        }
+      ],
+      "metrics": {
+        "accuracy": 0.841,
+        "precision": 0.2609,
+        "recall": 0.2885,
+        "f1": 0.274,
+        "roc_auc": 0.6927,
+        "log_loss": 0.4189,
+        "confusion_matrix": [
+          [
+            1622,
+            170
+          ],
+          [
+            148,
+            60
+          ]
+        ],
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0045,
+            0.0061,
+            0.0106,
+            0.0167,
+            0.0201,
+            0.0257,
+            0.0329,
+            0.0352,
+            0.0424,
+            0.0463,
+            0.053,
+            0.0608,
+            0.0686,
+            0.0731,
+            0.0759,
+            0.0787,
+            0.0893,
+            0.0921,
+            0.101,
+            0.1021,
+            0.1161,
+            0.1217,
+            0.1261,
+            0.1311,
+            0.1429,
+            0.1451,
+            0.1607,
+            0.1657,
+            0.1836,
+            0.1948,
+            0.2076,
+            0.2126,
+            0.2294,
+            0.2355,
+            0.2556,
+            0.2684,
+            0.2757,
+            0.2801,
+            0.2969,
+            0.3103,
+            0.3181,
+            0.327,
+            0.3438,
+            0.356,
+            0.3683,
+            0.3739,
+            0.3951,
+            0.4029,
+            0.4258,
+            0.4615,
+            0.4743,
+            0.4833,
+            0.5067,
+            0.5246,
+            0.5569,
+            0.5647,
+            0.5988,
+            0.606,
+            0.6228,
+            0.6261,
+            0.6417,
+            0.6825,
+            0.7254,
+            0.7372,
+            0.774,
+            0.784,
+            0.8047,
+            0.817,
+            0.8348,
+            0.88,
+            0.8979,
+            0.9805
+          ],
+          "tpr": [
+            0.0,
+            0.0288,
+            0.0481,
+            0.0577,
+            0.0865,
+            0.0962,
+            0.1106,
+            0.1202,
+            0.1346,
+            0.149,
+            0.1683,
+            0.1779,
+            0.1971,
+            0.2115,
+            0.2308,
+            0.2404,
+            0.2548,
+            0.2644,
+            0.2788,
+            0.2933,
+            0.3173,
+            0.3269,
+            0.3413,
+            0.351,
+            0.3702,
+            0.3798,
+            0.4038,
+            0.4135,
+            0.4279,
+            0.4375,
+            0.4519,
+            0.4663,
+            0.4808,
+            0.4952,
+            0.5096,
+            0.524,
+            0.5385,
+            0.5481,
+            0.5625,
+            0.5721,
+            0.5913,
+            0.601,
+            0.6202,
+            0.6298,
+            0.6442,
+            0.6538,
+            0.6683,
+            0.6779,
+            0.6923,
+            0.7019,
+            0.7212,
+            0.7308,
+            0.7452,
+            0.7548,
+            0.7692,
+            0.7788,
+            0.7933,
+            0.8077,
+            0.8221,
+            0.8317,
+            0.8462,
+            0.8558,
+            0.875,
+            0.8846,
+            0.899,
+            0.9087,
+            0.9231,
+            0.9327,
+            0.9471,
+            0.9567,
+            0.9712,
+            0.9808,
+            0.9952
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0743,
+            0.1504,
+            0.2479,
+            0.3447,
+            0.4474,
+            0.5396,
+            0.6377,
+            0.7357
+          ],
+          "fraction_positive": [
+            0.0173,
+            0.0593,
+            0.0744,
+            0.1236,
+            0.1511,
+            0.2319,
+            0.2785,
+            0.4615
+          ]
+        }
+      }
+    },
+    "linear_regression": {
+      "params": {
+        "fit_intercept": true
+      },
+      "metrics": {
+        "accuracy": 0.896,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "roc_auc": 0.7151,
+        "log_loss": 0.3213,
+        "confusion_matrix": [
+          [
+            1792,
+            0
+          ],
+          [
+            208,
+            0
+          ]
+        ],
+        "roc_curve": {
+          "fpr": [
+            0.0,
+            0.0078,
+            0.0145,
+            0.0162,
+            0.0201,
+            0.0223,
+            0.0285,
+            0.0301,
+            0.0324,
+            0.0346,
+            0.0413,
+            0.0469,
+            0.0552,
+            0.0614,
+            0.0703,
+            0.0725,
+            0.0843,
+            0.0893,
+            0.0943,
+            0.0954,
+            0.1027,
+            0.1105,
+            0.1155,
+            0.1205,
+            0.13,
+            0.1468,
+            0.1512,
+            0.1535,
+            0.1602,
+            0.1624,
+            0.1724,
+            0.1763,
+            0.1869,
+            0.1992,
+            0.2154,
+            0.2215,
+            0.2411,
+            0.2506,
+            0.2584,
+            0.2712,
+            0.3125,
+            0.3237,
+            0.3331,
+            0.3393,
+            0.3438,
+            0.3532,
+            0.3655,
+            0.3694,
+            0.3744,
+            0.3929,
+            0.3996,
+            0.4102,
+            0.4129,
+            0.4487,
+            0.4598,
+            0.4749,
+            0.495,
+            0.5117,
+            0.5513,
+            0.5547,
+            0.5675,
+            0.5709,
+            0.6205,
+            0.6356,
+            0.6624,
+            0.6975,
+            0.7533,
+            0.7595,
+            0.7662,
+            0.7852,
+            0.8471,
+            0.8823
+          ],
+          "tpr": [
+            0.0,
+            0.0096,
+            0.0192,
+            0.0385,
+            0.0481,
+            0.0673,
+            0.0865,
+            0.101,
+            0.125,
+            0.1442,
+            0.1635,
+            0.1827,
+            0.1923,
+            0.2067,
+            0.2163,
+            0.2356,
+            0.25,
+            0.2644,
+            0.274,
+            0.2885,
+            0.2981,
+            0.3125,
+            0.3221,
+            0.3413,
+            0.351,
+            0.3654,
+            0.3846,
+            0.4038,
+            0.4135,
+            0.4279,
+            0.4423,
+            0.4567,
+            0.4663,
+            0.4952,
+            0.5048,
+            0.5192,
+            0.5288,
+            0.5433,
+            0.5529,
+            0.5769,
+            0.5865,
+            0.601,
+            0.6106,
+            0.625,
+            0.6346,
+            0.649,
+            0.6587,
+            0.6779,
+            0.6875,
+            0.7019,
+            0.7115,
+            0.7356,
+            0.7452,
+            0.7596,
+            0.7692,
+            0.7837,
+            0.7933,
+            0.8077,
+            0.8221,
+            0.8365,
+            0.851,
+            0.8654,
+            0.8798,
+            0.8942,
+            0.9038,
+            0.9183,
+            0.9279,
+            0.9423,
+            0.9519,
+            0.9663,
+            0.976,
+            0.9952
+          ]
+        },
+        "calibration_curve": {
+          "mean_predicted": [
+            0.0462,
+            0.1452,
+            0.2367,
+            0.3141
+          ],
+          "fraction_positive": [
+            0.0483,
+            0.1332,
+            0.2607,
+            0.1111
+          ]
+        }
+      }
+    }
+  },
+  "model_comparison": [
+    {
+      "model": "XGBoost",
+      "accuracy": 0.775,
+      "precision": 0.1929,
+      "recall": 0.3654,
+      "f1": 0.2525,
+      "roc_auc": 0.6547,
+      "log_loss": 0.4712
+    },
+    {
+      "model": "Random Forest",
+      "accuracy": 0.841,
+      "precision": 0.2609,
+      "recall": 0.2885,
+      "f1": 0.274,
+      "roc_auc": 0.6927,
+      "log_loss": 0.4189
+    },
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.654,
+      "precision": 0.1799,
+      "recall": 0.6538,
+      "f1": 0.2822,
+      "roc_auc": 0.719,
+      "log_loss": 0.6145
+    },
+    {
+      "model": "Linear Regression",
+      "accuracy": 0.896,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.7151,
+      "log_loss": 0.3213
+    }
+  ]
+}
