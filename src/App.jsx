@@ -4,10 +4,11 @@ import RawDataSection from './components/RawDataSection.jsx'
 import CleaningSection from './components/CleaningSection.jsx'
 import XGBoostSection from './components/XGBoostSection.jsx'
 import CalibrationSection from './components/CalibrationSection.jsx'
+import BlendSection from './components/BlendSection.jsx'
 import ResultsSection from './components/ResultsSection.jsx'
 import { Loader2, AlertCircle } from 'lucide-react'
 
-const SECTION_IDS = ['raw-data', 'cleaning', 'xgb-training', 'calibration', 'results']
+const SECTION_IDS = ['raw-data', 'cleaning', 'xgb-training', 'calibration', 'blend', 'results']
 
 export default function App() {
   const [data, setData]       = useState(null)
@@ -96,7 +97,7 @@ export default function App() {
                 <span><span className="text-white font-semibold">{data.meta?.n_features}</span> features</span>
               </div>
               <span className="badge bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs">
-                4 Models
+                4 Models + Blend
               </span>
             </div>
           </div>
@@ -108,6 +109,7 @@ export default function App() {
           <CleaningSection  data={data} />
           <XGBoostSection   data={data} />
           <CalibrationSection data={data} />
+          <BlendSection     data={data} />
           <ResultsSection   data={data} />
 
           <footer className="mt-8 pt-6 border-t border-slate-800 text-center">

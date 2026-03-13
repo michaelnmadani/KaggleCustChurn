@@ -410,6 +410,72 @@ def train_linear_regression_as_classifier(X_train, y_train, X_test, y_test):
 
 
 # ─────────────────────────────────────────────
+# 4b. BLENDED ENSEMBLE
+# ─────────────────────────────────────────────
+
+def blend_models(y_test, model_probs: dict):
+    """
+    Combine all four model probability outputs using two strategies:
+      • Simple average  — equal weight to every model
+      • AUC-weighted    — weight each model by its test-set AUC score
+
+    Returns a dict with metrics for both blend variants plus the
+    per-model weights and individual AUC scores used.
+    """
+    print("[→] Building Blended Ensemble …")
+
+    from sklearn.metrics import roc_auc_score
+
+    # Collect probabilities and per-model AUCs
+    names  = list(model_probs.keys())
+    probs  = np.stack([model_probs[n] for n in names], axis=1)   # (n_test, 4)
+    aucs   = np.array([roc_auc_score(y_test, model_probs[n]) for n in names])
+
+    # ── Simple average ──────────────────────────────
+    simple_weights = np.ones(len(names)) / len(names)
+    y_prob_simple  = probs @ simple_weights
+    y_pred_simple  = (y_prob_simple >= 0.5).astype(int)
+    metrics_simple = compute_metrics(y_test, y_pred_simple, y_prob_simple)
+
+    # ── AUC-weighted average ────────────────────────
+    auc_weights    = aucs / aucs.sum()
+    y_prob_auc     = probs @ auc_weights
+    y_pred_auc     = (y_prob_auc >= 0.5).astype(int)
+    metrics_auc    = compute_metrics(y_test, y_pred_auc, y_prob_auc)
+
+    # Readable weight tables
+    simple_weight_table = [
+        {"model": n, "weight": round(float(w), 4), "auc": round(float(a), 4)}
+        for n, w, a in zip(names, simple_weights, aucs)
+    ]
+    auc_weight_table = [
+        {"model": n, "weight": round(float(w), 4), "auc": round(float(a), 4)}
+        for n, w, a in zip(names, auc_weights, aucs)
+    ]
+
+    print(f"[✓] Blend (simple)   — Accuracy: {metrics_simple['accuracy']:.4f}, "
+          f"AUC: {metrics_simple['roc_auc']:.4f}, F1: {metrics_simple['f1']:.4f}")
+    print(f"[✓] Blend (AUC-wtd)  — Accuracy: {metrics_auc['accuracy']:.4f}, "
+          f"AUC: {metrics_auc['roc_auc']:.4f}, F1: {metrics_auc['f1']:.4f}")
+
+    return {
+        "description": (
+            "Soft-voting ensemble combining XGBoost, Random Forest, "
+            "Logistic Regression, and Linear Regression probability outputs. "
+            "Two strategies: equal-weight average and AUC-weighted average."
+        ),
+        "simple_blend": {
+            "weights": simple_weight_table,
+            "metrics": metrics_simple,
+        },
+        "auc_weighted_blend": {
+            "weights": auc_weight_table,
+            "metrics": metrics_auc,
+        },
+    }
+
+
+# ─────────────────────────────────────────────
 # 5. DATASET STATS
 # ─────────────────────────────────────────────
 
@@ -505,20 +571,67 @@ def main():
     )
     print(f"\n[✓] Split — train: {X_train.shape[0]}, test: {X_test.shape[0]}")
 
-    # ── Models ──
-    xgb_results   = train_xgboost(X_train, y_train, X_test, y_test, feature_names)
+    # ── Individual models (collect raw probabilities for blending) ──
+    xgb_results    = train_xgboost(X_train, y_train, X_test, y_test, feature_names)
     lr_results     = train_logistic_regression(X_train, y_train, X_test, y_test)
     rf_results     = train_random_forest(X_train, y_train, X_test, y_test, feature_names)
     linreg_results = train_linear_regression_as_classifier(X_train, y_train, X_test, y_test)
 
-    # ── Comparison table ──
+    # Re-derive probabilities from trained models for the blender
+    # (re-run predict_proba so we don't have to thread them through returns)
+    from sklearn.linear_model import LinearRegression as _LR2, LogisticRegression as _Log2
+    from sklearn.ensemble import RandomForestClassifier as _RF2
+    import xgboost as _xgb2
+
+    # XGBoost
+    _xgb_m = _xgb2.XGBClassifier(
+        n_estimators=300, max_depth=5, learning_rate=0.08,
+        subsample=0.8, colsample_bytree=0.8, min_child_weight=3,
+        gamma=0.1, reg_alpha=0.05, reg_lambda=1.0,
+        scale_pos_weight=round(int((y_train==0).sum())/max(int((y_train==1).sum()),1),2),
+        eval_metric="logloss", random_state=42, n_jobs=-1,
+    )
+    _xgb_m.fit(X_train, y_train, eval_set=[(X_train, y_train)], verbose=False)
+    prob_xgb = _xgb_m.predict_proba(X_test)[:, 1]
+
+    # Logistic Regression
+    _sc1 = StandardScaler(); _sc1.fit(X_train)
+    _lr_m = _Log2(C=1.0, max_iter=1000, solver="lbfgs",
+                  class_weight="balanced", random_state=42)
+    _lr_m.fit(_sc1.transform(X_train), y_train)
+    prob_lr = _lr_m.predict_proba(_sc1.transform(X_test))[:, 1]
+
+    # Random Forest
+    _rf_m = _RF2(n_estimators=200, max_depth=10, min_samples_split=5,
+                 min_samples_leaf=2, class_weight="balanced", random_state=42)
+    _rf_m.fit(X_train, y_train)
+    prob_rf = _rf_m.predict_proba(X_test)[:, 1]
+
+    # Linear Regression
+    _sc2 = StandardScaler(); _sc2.fit(X_train)
+    _linreg_m = _LR2(fit_intercept=True)
+    _linreg_m.fit(_sc2.transform(X_train), y_train)
+    prob_linreg = np.clip(_linreg_m.predict(_sc2.transform(X_test)), 0, 1)
+
+    model_probs = {
+        "xgboost":             prob_xgb,
+        "random_forest":       prob_rf,
+        "logistic_regression": prob_lr,
+        "linear_regression":   prob_linreg,
+    }
+
+    # ── Blended ensemble ──
+    blend_results = blend_models(y_test, model_probs)
+
+    # ── Comparison table (all models + both blends) ──
     model_comparison = [
-        {"model": "XGBoost",            **xgb_results["metrics"]},
-        {"model": "Random Forest",      **rf_results["metrics"]},
-        {"model": "Logistic Regression", **lr_results["metrics"]},
-        {"model": "Linear Regression",  **linreg_results["metrics"]},
+        {"model": "XGBoost",               **xgb_results["metrics"]},
+        {"model": "Random Forest",         **rf_results["metrics"]},
+        {"model": "Logistic Regression",   **lr_results["metrics"]},
+        {"model": "Linear Regression",     **linreg_results["metrics"]},
+        {"model": "Blend (Simple Avg)",    **blend_results["simple_blend"]["metrics"]},
+        {"model": "Blend (AUC-Weighted)",  **blend_results["auc_weighted_blend"]["metrics"]},
     ]
-    # Remove nested objects from comparison rows
     for row in model_comparison:
         row.pop("confusion_matrix", None)
         row.pop("roc_curve", None)
@@ -537,11 +650,12 @@ def main():
         "raw_sample": raw_sample_dict,
         "cleaning_steps": CLEANING_STEPS,
         "models": {
-            "xgboost":            xgb_results,
+            "xgboost":             xgb_results,
             "logistic_regression": lr_results,
             "random_forest":       rf_results,
             "linear_regression":   linreg_results,
         },
+        "blend": blend_results,
         "model_comparison": model_comparison,
     }
 
@@ -553,7 +667,8 @@ def main():
     print(f"\n[✓] Results written → {out_path}")
     print("\n── Final Model Comparison ──")
     for row in model_comparison:
-        print(f"  {row['model']:22s}  Acc={row['accuracy']:.4f}  AUC={row['roc_auc']:.4f}  F1={row['f1']:.4f}")
+        print(f"  {row['model']:26s}  Acc={row['accuracy']:.4f}  "
+              f"AUC={row['roc_auc']:.4f}  F1={row['f1']:.4f}")
     print("=" * 60)
 
 
