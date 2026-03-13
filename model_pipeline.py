@@ -659,8 +659,23 @@ def main():
         "model_comparison": model_comparison,
     }
 
+    # ── Sanitise: replace NaN/Infinity with None before serialising ──
+    # Python's json module writes bare NaN which is invalid JSON and
+    # crashes JSON.parse in every browser.
+    import math, os
+
+    def _sanitise(obj):
+        if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+            return None
+        if isinstance(obj, dict):
+            return {k: _sanitise(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [_sanitise(v) for v in obj]
+        return obj
+
+    results = _sanitise(results)
+
     # ── Write JSON (public/ for legacy access; src/data/ for static import) ──
-    import os
     for out_path in ["public/results.json", "src/data/results.json"]:
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         with open(out_path, "w") as f:
