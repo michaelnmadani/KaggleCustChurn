@@ -94,8 +94,8 @@ export default function App() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-4 text-xs text-slate-400">
-                  <span><span className="text-white font-semibold">{data.meta?.train_samples?.toLocaleString()}</span> train</span>
-                  <span><span className="text-white font-semibold">{data.meta?.test_samples?.toLocaleString()}</span> test</span>
+                  <span><span className="text-white font-semibold">{data.meta?.train_samples?.toLocaleString()}</span> samples</span>
+                  <span><span className="text-white font-semibold">{data.meta?.cv_folds ?? 5}</span>-fold CV</span>
                   <span><span className="text-white font-semibold">{data.meta?.n_features}</span> features</span>
                 </div>
                 <span className="badge bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs">
