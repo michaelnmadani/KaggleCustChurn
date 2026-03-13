@@ -659,12 +659,14 @@ def main():
         "model_comparison": model_comparison,
     }
 
-    # ── Write JSON ──
-    out_path = "public/results.json"
-    with open(out_path, "w") as f:
-        json.dump(results, f, indent=2)
+    # ── Write JSON (public/ for legacy access; src/data/ for static import) ──
+    import os
+    for out_path in ["public/results.json", "src/data/results.json"]:
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        with open(out_path, "w") as f:
+            json.dump(results, f, indent=2)
 
-    print(f"\n[✓] Results written → {out_path}")
+    print(f"\n[✓] Results written → public/results.json + src/data/results.json")
     print("\n── Final Model Comparison ──")
     for row in model_comparison:
         print(f"  {row['model']:26s}  Acc={row['accuracy']:.4f}  "

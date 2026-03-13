@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import RawDataSection from './components/RawDataSection.jsx'
 import CleaningSection from './components/CleaningSection.jsx'
@@ -6,30 +6,18 @@ import XGBoostSection from './components/XGBoostSection.jsx'
 import CalibrationSection from './components/CalibrationSection.jsx'
 import BlendSection from './components/BlendSection.jsx'
 import ResultsSection from './components/ResultsSection.jsx'
-import { Loader2, AlertCircle } from 'lucide-react'
+import resultsRaw from './data/results.json?raw'
+const resultsData = JSON.parse(resultsRaw)
 
 const SECTION_IDS = ['raw-data', 'cleaning', 'xgb-training', 'calibration', 'blend', 'results']
 
 export default function App() {
-  const [data, setData]       = useState(null)
-  const [error, setError]     = useState(null)
-  const [active, setActive]   = useState('raw-data')
-  const observerRef           = useRef(null)
-
-  // Load results.json
-  useEffect(() => {
-    fetch('/results.json')
-      .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}: ${r.statusText}`)
-        return r.json()
-      })
-      .then(setData)
-      .catch(e => setError(e.message))
-  }, [])
+  const data = resultsData
+  const [active, setActive] = useState('raw-data')
+  const observerRef = useRef(null)
 
   // Intersection observer for active nav link
   useEffect(() => {
-    if (!data) return
     observerRef.current?.disconnect()
     const obs = new IntersectionObserver(
       entries => {
@@ -43,30 +31,7 @@ export default function App() {
     })
     observerRef.current = obs
     return () => obs.disconnect()
-  }, [data])
-
-  if (error) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="card text-center max-w-md">
-        <AlertCircle size={40} className="text-red-400 mx-auto mb-3" />
-        <h2 className="text-lg font-bold text-white mb-2">Failed to load results</h2>
-        <p className="text-sm text-slate-400 mb-4">{error}</p>
-        <p className="text-xs text-slate-500">
-          Run <code className="code-block text-xs py-0.5 px-1.5">python model_pipeline.py</code>
-          &nbsp;to generate <code>public/results.json</code>
-        </p>
-      </div>
-    </div>
-  )
-
-  if (!data) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 size={36} className="text-blue-400 animate-spin mx-auto mb-3" />
-        <p className="text-slate-400 text-sm">Loading ML results…</p>
-      </div>
-    </div>
-  )
+  }, [])
 
   return (
     <div className="flex min-h-screen">
