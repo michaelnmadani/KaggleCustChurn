@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { BarChart3, Award } from 'lucide-react'
 
+// Base models
 const MODEL_KEYS = ['xgboost', 'random_forest', 'logistic_regression', 'linear_regression']
 const MODEL_LABELS = {
   xgboost:             'XGBoost',
@@ -20,6 +21,15 @@ const MODEL_COLORS = {
   linear_regression:   '#ec4899',
 }
 
+// Blend variants (virtual model keys for the selector)
+const BLEND_KEYS   = ['blend_simple', 'blend_auc']
+const BLEND_LABELS = { blend_simple: 'Blend (Simple)', blend_auc: 'Blend (AUC-Wtd)' }
+const BLEND_COLORS = { blend_simple: '#8b5cf6',        blend_auc: '#06b6d4' }
+
+const ALL_KEYS   = [...MODEL_KEYS, ...BLEND_KEYS]
+const ALL_LABELS = { ...MODEL_LABELS, ...BLEND_LABELS }
+const ALL_COLORS = { ...MODEL_COLORS, ...BLEND_COLORS }
+
 function ConfusionMatrix({ matrix, label, color }) {
   if (!matrix?.length) return null
   const [[tn, fp], [fn, tp]] = matrix
@@ -33,10 +43,7 @@ function ConfusionMatrix({ matrix, label, color }) {
   return (
     <div className="card">
       <div className="flex items-center gap-2 mb-4">
-        <span
-          className="w-3 h-3 rounded-full shrink-0"
-          style={{ background: color }}
-        />
+        <span className="w-3 h-3 rounded-full shrink-0" style={{ background: color }} />
         <span className="text-sm font-semibold text-white">{label}</span>
       </div>
       <div className="grid grid-cols-2 gap-2 mb-3">
@@ -50,11 +57,10 @@ function ConfusionMatrix({ matrix, label, color }) {
           </div>
         ))}
       </div>
-      <div className="text-center">
-        <div className="text-xs text-slate-500">
-          <span className="text-slate-400 font-semibold">Predicted →</span> &nbsp;|&nbsp;
-          <span className="text-slate-400 font-semibold">↓ Actual</span>
-        </div>
+      <div className="text-center text-xs text-slate-500">
+        <span className="text-slate-400 font-semibold">Predicted →</span>
+        &nbsp;|&nbsp;
+        <span className="text-slate-400 font-semibold">↓ Actual</span>
       </div>
     </div>
   )
@@ -75,28 +81,35 @@ const MetricTooltip = ({ active, payload, label }) => {
 }
 
 export default function ResultsSection({ data }) {
-  const { models = {}, model_comparison = [] } = data
+  const { models = {}, blend = {}, model_comparison = [] } = data
   const [selectedModel, setSelectedModel] = useState('xgboost')
 
+  // Resolve metrics for any key (including blend virtuals)
+  const getMetrics = (key) => {
+    if (key === 'blend_simple')  return blend.simple_blend?.metrics
+    if (key === 'blend_auc')     return blend.auc_weighted_blend?.metrics
+    return models[key]?.metrics
+  }
+
   const metricsForChart = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+
+  // Grouped bar data — all 6 entries
   const barData = metricsForChart.map(m => {
     const row = { metric: m.replace('_', ' ').toUpperCase() }
-    MODEL_KEYS.forEach(k => {
-      row[MODEL_LABELS[k]] = models[k]?.metrics?.[m] ?? 0
-    })
+    ALL_KEYS.forEach(k => { row[ALL_LABELS[k]] = getMetrics(k)?.[m] ?? 0 })
     return row
   })
 
-  // Radar data
+  // Radar
   const radarData = metricsForChart.map(m => {
-    const row = { metric: m.replace('roc_auc','AUC').toUpperCase() }
-    MODEL_KEYS.forEach(k => {
-      row[MODEL_LABELS[k]] = parseFloat(((models[k]?.metrics?.[m] ?? 0) * 100).toFixed(1))
+    const row = { metric: m.replace('roc_auc', 'AUC').toUpperCase() }
+    ALL_KEYS.forEach(k => {
+      row[ALL_LABELS[k]] = parseFloat(((getMetrics(k)?.[m] ?? 0) * 100).toFixed(1))
     })
     return row
   })
 
-  // Best model by F1
+  // Best by F1 (from comparison table)
   const best = model_comparison.reduce((b, r) =>
     (r.f1 ?? 0) > (b.f1 ?? 0) ? r : b, model_comparison[0] ?? {}
   )
@@ -105,7 +118,8 @@ export default function ResultsSection({ data }) {
     <section id="results" className="mb-16 scroll-mt-6">
       <h2 className="section-title">Results &amp; Testing</h2>
       <p className="section-sub">
-        Confusion matrices, performance metrics, and model comparison on the held-out test set.
+        Confusion matrices, performance metrics, and full model comparison on the held-out test set
+        — including both blended ensemble variants.
       </p>
 
       {/* Best model banner */}
@@ -128,9 +142,9 @@ export default function ResultsSection({ data }) {
       <div className="card mb-6 overflow-x-auto">
         <div className="flex items-center gap-2 mb-4">
           <BarChart3 size={15} className="text-blue-400" />
-          <span className="text-sm font-semibold text-white">Model Comparison Table</span>
+          <span className="text-sm font-semibold text-white">Full Model Comparison Table</span>
         </div>
-        <table className="w-full text-sm min-w-[600px]">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-slate-700">
               {['Model','Accuracy','Precision','Recall','F1','AUC','Log-Loss'].map(h => (
@@ -140,17 +154,26 @@ export default function ResultsSection({ data }) {
           </thead>
           <tbody>
             {model_comparison.map((row, i) => {
-              const isBest = row.model === best.model
+              const isBest  = row.model === best.model
+              const isBlend = row.model.startsWith('Blend')
               return (
                 <tr
                   key={i}
-                  className={`border-b border-slate-800 transition-colors
-                    ${isBest ? 'bg-amber-500/5' : 'hover:bg-slate-800/30'}`}
+                  className={`border-b border-slate-800 transition-colors ${
+                    isBest  ? 'bg-amber-500/5' :
+                    isBlend ? 'bg-purple-500/5' :
+                    'hover:bg-slate-800/30'
+                  }`}
                 >
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       {isBest && <Award size={12} className="text-amber-400" />}
-                      <span className={`font-medium ${isBest ? 'text-amber-300' : 'text-white'}`}>
+                      {isBlend && !isBest && (
+                        <span className="w-2 h-2 rounded-full bg-purple-400 shrink-0" />
+                      )}
+                      <span className={`font-medium ${
+                        isBest ? 'text-amber-300' : isBlend ? 'text-purple-300' : 'text-white'
+                      }`}>
                         {row.model}
                       </span>
                     </div>
@@ -174,9 +197,9 @@ export default function ResultsSection({ data }) {
 
       {/* Grouped bar chart */}
       <div className="card mb-6">
-        <p className="text-sm font-semibold text-white mb-1">Performance Metrics — All Models</p>
+        <p className="text-sm font-semibold text-white mb-1">Performance Metrics — All Models + Blends</p>
         <p className="text-xs text-slate-400 mb-4">Side-by-side comparison across key metrics</p>
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={340}>
           <BarChart data={barData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
             <XAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 10 }} />
@@ -189,12 +212,13 @@ export default function ResultsSection({ data }) {
               wrapperStyle={{ fontSize: 11 }}
               formatter={v => <span style={{ color: '#cbd5e1' }}>{v}</span>}
             />
-            {MODEL_KEYS.map(k => (
+            {ALL_KEYS.map(k => (
               <Bar
                 key={k}
-                dataKey={MODEL_LABELS[k]}
-                fill={MODEL_COLORS[k]}
+                dataKey={ALL_LABELS[k]}
+                fill={ALL_COLORS[k]}
                 radius={[3, 3, 0, 0]}
+                opacity={BLEND_KEYS.includes(k) ? 0.85 : 1}
               />
             ))}
           </BarChart>
@@ -205,15 +229,11 @@ export default function ResultsSection({ data }) {
       <div className="card mb-6">
         <p className="text-sm font-semibold text-white mb-1">Radar — Multi-Metric Comparison</p>
         <p className="text-xs text-slate-400 mb-4">Values as percentages (0–100)</p>
-        <ResponsiveContainer width="100%" height={340}>
+        <ResponsiveContainer width="100%" height={360}>
           <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
             <PolarGrid stroke="#1e293b" />
             <PolarAngleAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-            <PolarRadiusAxis
-              angle={30} domain={[0, 100]}
-              tick={{ fill: '#64748b', fontSize: 9 }}
-              tickCount={4}
-            />
+            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 9 }} tickCount={4} />
             {MODEL_KEYS.map(k => (
               <Radar
                 key={k}
@@ -221,8 +241,20 @@ export default function ResultsSection({ data }) {
                 dataKey={MODEL_LABELS[k]}
                 stroke={MODEL_COLORS[k]}
                 fill={MODEL_COLORS[k]}
-                fillOpacity={0.12}
-                strokeWidth={2}
+                fillOpacity={0.08}
+                strokeWidth={1.5}
+                strokeDasharray="4 2"
+              />
+            ))}
+            {BLEND_KEYS.map(k => (
+              <Radar
+                key={k}
+                name={BLEND_LABELS[k]}
+                dataKey={BLEND_LABELS[k]}
+                stroke={BLEND_COLORS[k]}
+                fill={BLEND_COLORS[k]}
+                fillOpacity={0.2}
+                strokeWidth={2.5}
               />
             ))}
             <Legend
@@ -237,41 +269,41 @@ export default function ResultsSection({ data }) {
       <div>
         <p className="text-sm font-semibold text-white mb-1">Confusion Matrices</p>
         <p className="text-xs text-slate-400 mb-4">
-          Click a model tab to inspect its confusion matrix on the test set.
+          Select any model or blend variant to inspect its confusion matrix on the test set.
         </p>
-
-        {/* Model tabs */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {MODEL_KEYS.map(k => (
-            <button
-              key={k}
-              onClick={() => setSelectedModel(k)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                selectedModel === k
-                  ? 'text-white'
-                  : 'border-slate-600 text-slate-400 hover:text-slate-200 bg-transparent'
-              }`}
-              style={selectedModel === k ? {
-                background: MODEL_COLORS[k] + '33',
-                borderColor: MODEL_COLORS[k] + '88',
-                color: MODEL_COLORS[k],
-              } : {}}
-            >
-              {MODEL_LABELS[k]}
-            </button>
-          ))}
+          {ALL_KEYS.map(k => {
+            const isBlend = BLEND_KEYS.includes(k)
+            return (
+              <button
+                key={k}
+                onClick={() => setSelectedModel(k)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  selectedModel === k ? 'text-white' : 'border-slate-600 text-slate-400 hover:text-slate-200'
+                }`}
+                style={selectedModel === k ? {
+                  background: ALL_COLORS[k] + '33',
+                  borderColor: ALL_COLORS[k] + '88',
+                  color: ALL_COLORS[k],
+                } : {}}
+              >
+                {isBlend && <span className="mr-1 opacity-70">◈</span>}
+                {ALL_LABELS[k]}
+              </button>
+            )
+          })}
         </div>
 
         <div className="max-w-xs">
           <ConfusionMatrix
-            matrix={models[selectedModel]?.metrics?.confusion_matrix}
-            label={MODEL_LABELS[selectedModel]}
-            color={MODEL_COLORS[selectedModel]}
+            matrix={getMetrics(selectedModel)?.confusion_matrix}
+            label={ALL_LABELS[selectedModel]}
+            color={ALL_COLORS[selectedModel]}
           />
         </div>
 
         {/* Metric cards for selected model */}
-        {models[selectedModel]?.metrics && (
+        {getMetrics(selectedModel) && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-4">
             {[
               { key: 'accuracy',  label: 'Accuracy',  color: 'text-blue-400' },
@@ -283,7 +315,7 @@ export default function ResultsSection({ data }) {
             ].map(({ key, label, color }) => (
               <div key={key} className="metric-card">
                 <div className={`metric-value ${color}`}>
-                  {models[selectedModel].metrics[key]?.toFixed(4)}
+                  {getMetrics(selectedModel)[key]?.toFixed(4)}
                 </div>
                 <div className="metric-label">{label}</div>
               </div>

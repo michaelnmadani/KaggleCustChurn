@@ -1,13 +1,14 @@
 import React from 'react'
 import {
-  Database, Wrench, BrainCircuit, LineChart, BarChart3, ChevronRight,
+  Database, Wrench, BrainCircuit, LineChart, BarChart3, Layers, ChevronRight,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { id: 'raw-data',     label: 'Raw Data Overview',     icon: Database },
-  { id: 'cleaning',     label: 'Cleaning Pipeline',      icon: Wrench },
-  { id: 'xgb-training', label: 'XGBoost Training',       icon: BrainCircuit },
+  { id: 'raw-data',     label: 'Raw Data Overview',      icon: Database },
+  { id: 'cleaning',     label: 'Cleaning Pipeline',       icon: Wrench },
+  { id: 'xgb-training', label: 'XGBoost Training',        icon: BrainCircuit },
   { id: 'calibration',  label: 'Model Fit & Calibration', icon: LineChart },
+  { id: 'blend',        label: 'Blended Ensemble',        icon: Layers },
   { id: 'results',      label: 'Results & Testing',       icon: BarChart3 },
 ]
 
