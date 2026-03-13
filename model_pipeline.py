@@ -357,7 +357,12 @@ def train_random_forest(X, y, feature_names, skf):
 
 
 def train_linear_regression_as_classifier(X, y, skf):
-    """OLS regression clipped to [0,1] and thresholded at 0.5."""
+    """
+    OLS regression clipped to [0,1].
+    Threshold chosen via Youden's J (max TPR-FPR) on OOF predictions
+    rather than a fixed 0.5 — necessary because OLS scores concentrate
+    near the base rate (~0.10) on imbalanced data.
+    """
     print("[→] Training Linear Regression (5-fold CV + full fit) …")
 
     pipeline = Pipeline([
@@ -367,11 +372,22 @@ def train_linear_regression_as_classifier(X, y, skf):
 
     y_prob_raw_oof = cross_val_predict(pipeline, X, y, cv=skf, method="predict")
     y_prob_oof = np.clip(y_prob_raw_oof, 0, 1)
-    y_pred_oof = (y_prob_oof >= 0.5).astype(int)
+
+    # Youden's J: find threshold that maximises TPR - FPR
+    fpr_arr, tpr_arr, thresh_arr = roc_curve(y, y_prob_oof)
+    best_idx = int(np.argmax(tpr_arr - fpr_arr))
+    best_threshold = float(thresh_arr[best_idx])
+
+    y_pred_oof = (y_prob_oof >= best_threshold).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
-    print(f"[✓] Linear Regression (OOF) — Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
-    return {"params": {"fit_intercept": True}, "metrics": metrics, "_oof_probs": y_prob_oof}
+    print(f"[✓] Linear Regression (OOF, thresh={best_threshold:.3f}) — "
+          f"Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
+    return {
+        "params": {"fit_intercept": True, "threshold": round(best_threshold, 4)},
+        "metrics": metrics,
+        "_oof_probs": y_prob_oof,
+    }
 
 
 # ─────────────────────────────────────────────
