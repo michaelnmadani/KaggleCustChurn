@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  LineChart, Line, ResponsiveContainer, Legend, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip,
+  LineChart, Line, ResponsiveContainer, Legend,
 } from 'recharts'
 import { Layers, Scale, TrendingUp, Info } from 'lucide-react'
 
@@ -19,19 +19,6 @@ const VARIANT_COLORS = {
 
 const BASE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ec4899']
 
-const MetricTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-xs shadow-xl">
-      <p className="text-slate-200 font-semibold mb-1">{label}</p>
-      {payload.map(p => (
-        <p key={p.name} style={{ color: p.fill || p.stroke }}>
-          {p.name}: {typeof p.value === 'number' ? (p.value > 1 ? p.value.toFixed(1) + '%' : p.value.toFixed(4)) : p.value}
-        </p>
-      ))}
-    </div>
-  )
-}
 
 function WeightTable({ weights, color }) {
   return (
@@ -193,39 +180,44 @@ export default function BlendSection({ data }) {
         </div>
       </div>
 
-      {/* F1 & AUC lift chart */}
+      {/* F1 & AUC lift table */}
       <div className="card mb-6">
         <div className="flex items-center gap-2 mb-1">
           <Layers size={15} className="text-purple-400" />
           <span className="text-sm font-semibold text-white">F1 &amp; AUC-ROC — All Models + Blends</span>
         </div>
         <p className="text-xs text-slate-400 mb-4">Side-by-side comparison showing the lift from ensembling</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={liftData} margin={{ top: 5, right: 10, left: 0, bottom: 60 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis
-              dataKey="name"
-              tick={{ fill: '#94a3b8', fontSize: 10 }}
-              angle={-30} textAnchor="end"
-              interval={0}
-            />
-            <YAxis
-              domain={[0, 1]} tick={{ fill: '#94a3b8', fontSize: 10 }}
-              tickFormatter={v => v.toFixed(1)}
-            />
-            <Tooltip content={<MetricTooltip />} />
-            <Legend
-              wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-              formatter={v => <span style={{ color: '#cbd5e1' }}>{v}</span>}
-            />
-            <Bar dataKey="f1" name="F1-Score" radius={[3, 3, 0, 0]}>
-              {liftData.map((d, i) => <Cell key={i} fill={d.color} fillOpacity={0.9} />)}
-            </Bar>
-            <Bar dataKey="auc" name="AUC-ROC" radius={[3, 3, 0, 0]}>
-              {liftData.map((d, i) => <Cell key={i} fill={d.color} fillOpacity={0.45} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-700">
+              {['Model', 'F1-Score', 'AUC-ROC'].map(h => (
+                <th key={h} className="px-3 py-2 text-left text-slate-400 font-semibold text-xs">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {liftData.map((d, i) => {
+              const isBlend = d.name.startsWith('Blend')
+              return (
+                <tr
+                  key={i}
+                  className={`border-b border-slate-800 ${isBlend ? 'bg-purple-500/5' : 'hover:bg-slate-800/30'}`}
+                >
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
+                      <span className={`font-medium text-xs ${isBlend ? 'text-purple-300' : 'text-white'}`}>
+                        {d.name}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-slate-200">{d.f1.toFixed(4)}</td>
+                  <td className="px-3 py-2.5 font-mono text-xs text-slate-200">{d.auc.toFixed(4)}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
 
       {/* ROC curve including blends */}
