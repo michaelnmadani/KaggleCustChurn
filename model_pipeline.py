@@ -16,6 +16,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from sklearn.base import clone
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -23,7 +24,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    confusion_matrix, roc_curve, auc, log_loss,
+    confusion_matrix, roc_curve, auc, log_loss, roc_auc_score,
 )
 from sklearn.calibration import calibration_curve
 from sklearn.impute import SimpleImputer
@@ -171,6 +172,16 @@ CLEANING_STEPS = [
         "description": "StandardScaler (zero mean, unit variance) is applied inside a Pipeline for Logistic Regression and Linear Regression. Tree-based models use raw integers.",
         "code": "pipeline = Pipeline([('scaler', StandardScaler()), ('model', estimator)])"
     },
+    {
+        "step": "Tenure band flags",
+        "description": "Create three binary flags from the tenure column: TenureShort (< 10 months), TenureMid (11–20 months), TenureLong (≥ 21 months). Captures non-linear tenure effects.",
+        "code": "df['TenureShort'] = (df['tenure'] < 10).astype(int)\ndf['TenureMid'] = ((df['tenure'] >= 11) & (df['tenure'] <= 20)).astype(int)\ndf['TenureLong'] = (df['tenure'] >= 21).astype(int)"
+    },
+    {
+        "step": "HasFamilyTies flag",
+        "description": "Combine Partner and Dependents into a single flag: HasFamilyTies = 1 when both Partner='Yes' AND Dependents='Yes'. Computed before label-encoding so the string values are still readable.",
+        "code": "df['HasFamilyTies'] = ((df['Partner'] == 'Yes') & (df['Dependents'] == 'Yes')).astype(int)"
+    },
 ]
 
 
@@ -191,6 +202,17 @@ def clean_data(df: pd.DataFrame):
     num_cols = [c for c in num_cols if c != "Churn"]
     imputer = SimpleImputer(strategy="median")
     df[num_cols] = imputer.fit_transform(df[num_cols])
+
+    # ── Feature flags (computed while Partner/Dependents are still "Yes"/"No" strings) ──
+    df["TenureShort"] = (df["tenure"] < 10).astype(int)
+    df["TenureMid"]   = ((df["tenure"] >= 11) & (df["tenure"] <= 20)).astype(int)
+    df["TenureLong"]  = (df["tenure"] >= 21).astype(int)
+
+    if "Partner" in df.columns and "Dependents" in df.columns:
+        df["HasFamilyTies"] = (
+            (df["Partner"].astype(str).str.strip().str.lower() == "yes") &
+            (df["Dependents"].astype(str).str.strip().str.lower() == "yes")
+        ).astype(int)
 
     cat_cols = df.select_dtypes(include="object").columns.tolist()
     le = LabelEncoder()
@@ -236,6 +258,55 @@ def compute_metrics(y_true, y_pred, y_prob):
 
 
 # ─────────────────────────────────────────────
+# 3b. PER-FOLD CV HELPERS
+# ─────────────────────────────────────────────
+
+def _cv_fold_proba(model, X, y, skf):
+    """Manual k-fold loop for classifiers with predict_proba.
+    Returns OOF probabilities and per-fold accuracy / F1 / AUC."""
+    y_prob_oof = np.zeros(len(y))
+    fold_scores = []
+    for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
+        m = clone(model)
+        m.fit(X[train_idx], y[train_idx])
+        prob = m.predict_proba(X[val_idx])[:, 1]
+        y_prob_oof[val_idx] = prob
+        pred = (prob >= 0.5).astype(int)
+        fold_scores.append({
+            "fold":     fold_i,
+            "accuracy": round(float(accuracy_score(y[val_idx], pred)), 4),
+            "f1":       round(float(f1_score(y[val_idx], pred, zero_division=0)), 4),
+            "roc_auc":  round(float(roc_auc_score(y[val_idx], prob)), 4),
+        })
+    return y_prob_oof, fold_scores
+
+
+def _cv_fold_linreg(pipeline, X, y, skf):
+    """Manual k-fold loop for a regression pipeline used as a classifier.
+    Threshold is chosen via Youden's J on each fold's validation set."""
+    y_prob_oof = np.zeros(len(y))
+    fold_scores = []
+    for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
+        m = clone(pipeline)
+        m.fit(X[train_idx], y[train_idx])
+        prob = np.clip(m.predict(X[val_idx]), 0, 1)
+        y_prob_oof[val_idx] = prob
+        # Youden's J threshold on this fold's validation predictions
+        fpr_f, tpr_f, thr_f = roc_curve(y[val_idx], prob)
+        best_idx_f = int(np.argmax(tpr_f - fpr_f))
+        thr = float(thr_f[best_idx_f])
+        pred = (prob >= thr).astype(int)
+        fold_scores.append({
+            "fold":      fold_i,
+            "accuracy":  round(float(accuracy_score(y[val_idx], pred)), 4),
+            "f1":        round(float(f1_score(y[val_idx], pred, zero_division=0)), 4),
+            "roc_auc":   round(float(roc_auc_score(y[val_idx], prob)), 4),
+            "threshold": round(thr, 4),
+        })
+    return y_prob_oof, fold_scores
+
+
+# ─────────────────────────────────────────────
 # 4. MODEL TRAINING (CV + FULL FIT)
 # ─────────────────────────────────────────────
 
@@ -262,9 +333,9 @@ def train_xgboost(X, y, feature_names, skf):
         "n_jobs":           -1,
     }
 
-    # ── Out-of-fold CV probabilities ──
+    # ── Out-of-fold CV probabilities + per-fold metrics ──
     model_cv = xgb.XGBClassifier(**params)
-    y_prob_oof = cross_val_predict(model_cv, X, y, cv=skf, method="predict_proba")[:, 1]
+    y_prob_oof, fold_scores = _cv_fold_proba(model_cv, X, y, skf)
     y_pred_oof = (y_prob_oof >= 0.5).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
@@ -302,6 +373,7 @@ def train_xgboost(X, y, feature_names, skf):
         "params": display_params,
         "training_log": training_log,
         "feature_importance": feature_importance,
+        "fold_scores": fold_scores,
         "metrics": metrics,
         "_oof_probs": y_prob_oof,
     }
@@ -318,12 +390,12 @@ def train_logistic_regression(X, y, skf):
         ("model", LogisticRegression(**lr_params)),
     ])
 
-    y_prob_oof = cross_val_predict(pipeline, X, y, cv=skf, method="predict_proba")[:, 1]
+    y_prob_oof, fold_scores = _cv_fold_proba(pipeline, X, y, skf)
     y_pred_oof = (y_prob_oof >= 0.5).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
     print(f"[✓] Logistic Regression (OOF) — Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
-    return {"params": lr_params, "metrics": metrics, "_oof_probs": y_prob_oof}
+    return {"params": lr_params, "fold_scores": fold_scores, "metrics": metrics, "_oof_probs": y_prob_oof}
 
 
 def train_random_forest(X, y, feature_names, skf):
@@ -339,7 +411,7 @@ def train_random_forest(X, y, feature_names, skf):
     }
 
     model_cv = RandomForestClassifier(**rf_params)
-    y_prob_oof = cross_val_predict(model_cv, X, y, cv=skf, method="predict_proba")[:, 1]
+    y_prob_oof, fold_scores = _cv_fold_proba(model_cv, X, y, skf)
     y_pred_oof = (y_prob_oof >= 0.5).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
@@ -353,7 +425,7 @@ def train_random_forest(X, y, feature_names, skf):
     ]
 
     print(f"[✓] Random Forest (OOF) — Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
-    return {"params": rf_params, "feature_importance": feature_importance, "metrics": metrics, "_oof_probs": y_prob_oof}
+    return {"params": rf_params, "feature_importance": feature_importance, "fold_scores": fold_scores, "metrics": metrics, "_oof_probs": y_prob_oof}
 
 
 def train_linear_regression_as_classifier(X, y, skf):
@@ -370,10 +442,10 @@ def train_linear_regression_as_classifier(X, y, skf):
         ("model", LinearRegression(fit_intercept=True)),
     ])
 
-    y_prob_raw_oof = cross_val_predict(pipeline, X, y, cv=skf, method="predict")
-    y_prob_oof = np.clip(y_prob_raw_oof, 0, 1)
+    # Per-fold metrics (each fold uses Youden's J on its own validation set)
+    y_prob_oof, fold_scores = _cv_fold_linreg(pipeline, X, y, skf)
 
-    # Youden's J: find threshold that maximises TPR - FPR
+    # Global Youden's J threshold on the full OOF predictions
     fpr_arr, tpr_arr, thresh_arr = roc_curve(y, y_prob_oof)
     best_idx = int(np.argmax(tpr_arr - fpr_arr))
     best_threshold = float(thresh_arr[best_idx])
@@ -385,6 +457,7 @@ def train_linear_regression_as_classifier(X, y, skf):
           f"Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
     return {
         "params": {"fit_intercept": True, "threshold": round(best_threshold, 4)},
+        "fold_scores": fold_scores,
         "metrics": metrics,
         "_oof_probs": y_prob_oof,
     }

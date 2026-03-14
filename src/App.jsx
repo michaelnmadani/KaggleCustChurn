@@ -722,6 +722,76 @@ function ModelSection({ data }) {
         { n: `${data.meta.cv_folds}-fold`, l: "Cross-Validation" },
         { n: "4", l: "Base Models" },
       ]} />
+
+      <SubHeading>Cross-Validation Fold Scores</SubHeading>
+      <P>
+        Per-fold accuracy, F1, and AUC across all {data.meta.cv_folds} stratified folds for each model.
+        Consistent scores indicate stable models with low variance across splits.
+      </P>
+
+      {(() => {
+        const models = [
+          { key: "xgboost",            label: "XGBoost" },
+          { key: "random_forest",      label: "Random Forest" },
+          { key: "logistic_regression",label: "Logistic Reg." },
+          { key: "linear_regression",  label: "Linear Reg." },
+        ];
+        const foldCount = data.meta.cv_folds;
+        const metrics = ["accuracy", "f1", "roc_auc"];
+        const metricLabels = { accuracy: "Acc", f1: "F1", roc_auc: "AUC" };
+
+        return (
+          <Figure caption={`Each fold ≈ ${Math.round(data.meta.train_samples / foldCount)} customers. Metrics computed on held-out validation fold.`}>
+            <div style={{ overflowX: "auto", border: "1px solid #e6e6e6", borderRadius: "6px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", ...sans }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...thStyle, width: "60px", textAlign: "center" }}>Fold</th>
+                    {models.map(({ label }) =>
+                      metrics.map((mk) => (
+                        <th key={`${label}-${mk}`} style={{ ...thStyle, textAlign: "center", whiteSpace: "nowrap" }}>
+                          {label}<br /><span style={{ fontWeight: 400, color: "#999" }}>{metricLabels[mk]}</span>
+                        </th>
+                      ))
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: foldCount }, (_, fi) => (
+                    <tr key={fi} style={{ background: fi % 2 === 0 ? "#fff" : "#fafafa" }}>
+                      <td style={{ ...tdStyle, textAlign: "center", fontWeight: 700, color: "#555" }}>Fold {fi + 1}</td>
+                      {models.map(({ key }) => {
+                        const fs = (data.models[key].fold_scores || [])[fi] || {};
+                        return metrics.map((mk) => (
+                          <td key={`${key}-${mk}`} style={{ ...tdStyle, textAlign: "center", fontWeight: 600, color: "#111" }}>
+                            {fs[mk] != null ? (mk === "roc_auc" ? fs[mk].toFixed(4) : `${(fs[mk] * 100).toFixed(1)}%`) : "—"}
+                          </td>
+                        ));
+                      })}
+                    </tr>
+                  ))}
+                  {/* Mean row */}
+                  <tr style={{ background: "#f9fafb", borderTop: "2px solid #222" }}>
+                    <td style={{ ...tdStyle, fontWeight: 700 }}>Mean</td>
+                    {models.map(({ key }) => {
+                      const foldScores = data.models[key].fold_scores || [];
+                      return metrics.map((mk) => {
+                        const vals = foldScores.map((f) => f[mk]).filter((v) => v != null);
+                        const mean = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+                        return (
+                          <td key={`${key}-${mk}-mean`} style={{ ...tdStyle, textAlign: "center", fontWeight: 700, color: "#059669" }}>
+                            {mean != null ? (mk === "roc_auc" ? mean.toFixed(4) : `${(mean * 100).toFixed(1)}%`) : "—"}
+                          </td>
+                        );
+                      });
+                    })}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Figure>
+        );
+      })()}
     </section>
   );
 }
