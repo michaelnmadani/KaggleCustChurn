@@ -315,7 +315,8 @@ def train_xgboost(X, y, feature_names, skf):
 
     neg_count = int((y == 0).sum())
     pos_count = int((y == 1).sum())
-    spw = round(neg_count / max(pos_count, 1), 2)
+    # 2× the natural ratio: penalises missing a churner twice as hard as a stayer
+    spw = round(2 * neg_count / max(pos_count, 1), 2)
 
     params = {
         "n_estimators":     300,
@@ -401,12 +402,17 @@ def train_logistic_regression(X, y, skf):
 def train_random_forest(X, y, feature_names, skf):
     print("[→] Training Random Forest (5-fold CV + full fit) …")
 
+    neg_count = int((y == 0).sum())
+    pos_count = int((y == 1).sum())
+    # 2× the natural ratio: penalises missing a churner twice as hard as a stayer
+    rf_cw = {0: 1, 1: round(2 * neg_count / max(pos_count, 1), 2)}
+
     rf_params = {
         "n_estimators":      200,
         "max_depth":         10,
         "min_samples_split": 5,
         "min_samples_leaf":  2,
-        "class_weight":      "balanced",
+        "class_weight":      rf_cw,
         "random_state":      42,
     }
 
