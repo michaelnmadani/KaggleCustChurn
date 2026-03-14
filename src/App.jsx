@@ -300,11 +300,17 @@ function CleaningSection({ data }) {
       <SubHeading>Cleaning Pipeline</SubHeading>
 
       <Figure caption={`${steps.length} steps transform the raw data into ${data.meta.n_features} model-ready features`}>
-        <div style={{ overflowX: "auto", border: "1px solid #e6e6e6", borderRadius: "6px" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", ...sans }}>
+        <div style={{ border: "1px solid #e6e6e6", borderRadius: "6px", overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", ...sans }}>
+            <colgroup>
+              <col style={{ width: "28px" }} />
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "32%" }} />
+              <col style={{ width: "50%" }} />
+            </colgroup>
             <thead>
               <tr>
-                <th style={{ ...thStyle, width: "32px", textAlign: "center" }}>#</th>
+                <th style={{ ...thStyle, textAlign: "center" }}>#</th>
                 <th style={thStyle}>Step</th>
                 <th style={thStyle}>Description</th>
                 <th style={thStyle}>Code</th>
@@ -314,10 +320,10 @@ function CleaningSection({ data }) {
               {steps.map((row, i) => (
                 <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
                   <td style={{ ...tdStyle, fontWeight: 700, color: "#999", textAlign: "center" }}>{i + 1}</td>
-                  <td style={{ ...tdStyle, fontWeight: 600, color: "#222", whiteSpace: "nowrap" }}>{row.step}</td>
-                  <td style={{ ...tdStyle, color: "#555", fontSize: "10px" }}>{row.description}</td>
-                  <td style={tdStyle}>
-                    <code style={{ ...mono, fontSize: "9px", background: "#f5f5f5", padding: "2px 6px", borderRadius: "3px", color: "#555" }}>
+                  <td style={{ ...tdStyle, fontWeight: 600, color: "#222", wordBreak: "break-word" }}>{row.step}</td>
+                  <td style={{ ...tdStyle, color: "#555", fontSize: "10px", wordBreak: "break-word" }}>{row.description}</td>
+                  <td style={{ ...tdStyle, wordBreak: "break-word" }}>
+                    <code style={{ ...mono, fontSize: "9px", background: "#f5f5f5", padding: "2px 6px", borderRadius: "3px", color: "#555", whiteSpace: "pre-wrap" }}>
                       {row.code}
                     </code>
                   </td>
