@@ -1,52 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-@layer base {
-  html { scroll-behavior: smooth; }
-  body {
-    @apply bg-slate-950 text-slate-100 font-sans;
-  }
+body {
+  background: #fff;
+  color: #111;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer components {
-  .card {
-    @apply bg-slate-900 border border-slate-700/60 rounded-xl p-6 shadow-lg;
-  }
-  .section-title {
-    @apply text-2xl font-bold text-white mb-1;
-  }
-  .section-sub {
-    @apply text-sm text-slate-400 mb-6;
-  }
-  .metric-card {
-    @apply bg-slate-800/70 rounded-lg p-4 border border-slate-700/40 text-center;
-  }
-  .metric-value {
-    @apply text-3xl font-bold text-blue-400;
-  }
-  .metric-label {
-    @apply text-xs uppercase tracking-wider text-slate-400 mt-1;
-  }
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-  .nav-link {
-    @apply flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all duration-150;
-  }
-  .nav-link-active {
-    @apply bg-blue-600/20 text-blue-400 border border-blue-500/30;
-  }
-  .nav-link-inactive {
-    @apply text-slate-400 hover:text-slate-200 hover:bg-slate-800;
-  }
-  .code-block {
-    @apply bg-slate-950 rounded-lg p-4 font-mono text-sm text-emerald-400 border border-slate-700/50 overflow-x-auto;
-  }
-}
+figure { margin: 0; }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0f172a; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+button { font: inherit; }
