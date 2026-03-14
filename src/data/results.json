@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-03-14T11:05:38.128496",
+    "generated_at": "2026-03-14T11:07:45.886748",
     "train_samples": 10000,
     "test_samples": 0,
     "cv_folds": 5,
@@ -4317,7 +4317,6 @@
         "max_depth": 10,
         "min_samples_split": 5,
         "min_samples_leaf": 2,
-        "class_weight": "balanced",
         "random_state": 42
       },
       "feature_importance": [
