@@ -17,6 +17,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from sklearn.base import clone
+from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -263,12 +264,15 @@ def compute_metrics(y_true, y_pred, y_prob):
 
 def _cv_fold_proba(model, X, y, skf):
     """Manual k-fold loop for classifiers with predict_proba.
+    SMOTE is applied to each training fold only; validation folds are untouched.
     Returns OOF probabilities and per-fold accuracy / F1 / AUC."""
+    smote = SMOTE(random_state=42)
     y_prob_oof = np.zeros(len(y))
     fold_scores = []
     for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
+        X_tr, y_tr = smote.fit_resample(X[train_idx], y[train_idx])
         m = clone(model)
-        m.fit(X[train_idx], y[train_idx])
+        m.fit(X_tr, y_tr)
         prob = m.predict_proba(X[val_idx])[:, 1]
         y_prob_oof[val_idx] = prob
         pred = (prob >= 0.5).astype(int)
@@ -283,12 +287,14 @@ def _cv_fold_proba(model, X, y, skf):
 
 def _cv_fold_linreg(pipeline, X, y, skf):
     """Manual k-fold loop for a regression pipeline used as a classifier.
-    Threshold is chosen via Youden's J on each fold's validation set."""
+    SMOTE is applied to each training fold only; threshold via Youden's J per fold."""
+    smote = SMOTE(random_state=42)
     y_prob_oof = np.zeros(len(y))
     fold_scores = []
     for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
+        X_tr, y_tr = smote.fit_resample(X[train_idx], y[train_idx])
         m = clone(pipeline)
-        m.fit(X[train_idx], y[train_idx])
+        m.fit(X_tr, y_tr)
         prob = np.clip(m.predict(X[val_idx]), 0, 1)
         y_prob_oof[val_idx] = prob
         # Youden's J threshold on this fold's validation predictions
@@ -340,9 +346,10 @@ def train_xgboost(X, y, feature_names, skf):
     y_pred_oof = (y_prob_oof >= 0.5).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
-    # ── Final model on 100% data (for feature importance + training log) ──
+    # ── Final model on 100% SMOTE-resampled data (feature importance + training log) ──
+    X_res, y_res = SMOTE(random_state=42).fit_resample(X, y)
     model_final = xgb.XGBClassifier(**params)
-    model_final.fit(X, y, eval_set=[(X, y)], verbose=False)
+    model_final.fit(X_res, y_res, eval_set=[(X_res, y_res)], verbose=False)
 
     try:
         evals_result = model_final.evals_result()
@@ -402,17 +409,11 @@ def train_logistic_regression(X, y, skf):
 def train_random_forest(X, y, feature_names, skf):
     print("[→] Training Random Forest (5-fold CV + full fit) …")
 
-    neg_count = int((y == 0).sum())
-    pos_count = int((y == 1).sum())
-    # 2× the natural ratio: penalises missing a churner twice as hard as a stayer
-    rf_cw = {0: 1, 1: round(2 * neg_count / max(pos_count, 1), 2)}
-
     rf_params = {
         "n_estimators":      200,
         "max_depth":         10,
         "min_samples_split": 5,
         "min_samples_leaf":  2,
-        "class_weight":      rf_cw,
         "random_state":      42,
     }
 
@@ -421,9 +422,10 @@ def train_random_forest(X, y, feature_names, skf):
     y_pred_oof = (y_prob_oof >= 0.5).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
-    # Full fit for feature importance
+    # Full fit for feature importance (SMOTE on full training set)
+    X_res, y_res = SMOTE(random_state=42).fit_resample(X, y)
     model_final = RandomForestClassifier(**rf_params)
-    model_final.fit(X, y)
+    model_final.fit(X_res, y_res)
     fi = model_final.feature_importances_
     fi_pairs = sorted(zip(feature_names, fi.tolist()), key=lambda x: x[1], reverse=True)
     feature_importance = [
