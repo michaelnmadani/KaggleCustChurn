@@ -30,11 +30,34 @@ from sklearn.metrics import (
 from sklearn.calibration import calibration_curve
 from sklearn.impute import SimpleImputer
 import xgboost as xgb
+import lightgbm as lgb
+from itertools import combinations
+from sklearn.preprocessing import RobustScaler, OrdinalEncoder, KBinsDiscretizer, PolynomialFeatures
+from sklearn.metrics import matthews_corrcoef
 
 warnings.filterwarnings("ignore")
 np.random.seed(42)
 
 CV_FOLDS = 5
+
+# ─────────────────────────────────────────────
+# LIGHTGBM CONFIG  (from Kaggle S6E3 notebook)
+# ─────────────────────────────────────────────
+
+LGBM_NUM_COLUMNS = ["SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges"]
+LGBM_CAT_COLUMNS = [
+    "gender", "Partner", "Dependents", "PhoneService", "MultipleLines",
+    "InternetService", "OnlineSecurity", "OnlineBackup", "DeviceProtection",
+    "TechSupport", "StreamingTV", "StreamingMovies", "Contract",
+    "PaperlessBilling", "PaymentMethod",
+]
+LGBM_PARAMS = {
+    "objective": "binary", "metric": "auc", "n_estimators": 3000,
+    "learning_rate": 0.02, "num_leaves": 20, "max_depth": 4,
+    "min_child_samples": 20, "subsample": 0.7, "colsample_bytree": 0.7,
+    "reg_alpha": 0.1, "reg_lambda": 0.1, "random_state": 42,
+    "n_jobs": -1, "verbose": -1,
+}
 
 
 # ─────────────────────────────────────────────
@@ -660,6 +683,256 @@ def compute_dataset_stats(raw_df: pd.DataFrame):
 
 
 # ─────────────────────────────────────────────
+# 5b. LIGHTGBM — 10-STEP FEATURE ENGINEERING
+# ─────────────────────────────────────────────
+
+def _lgbm_prepare_raw(raw_df: pd.DataFrame):
+    """Minimal preprocessing that preserves categorical columns as strings."""
+    df = raw_df.copy()
+    for col in ("customerID", "id"):
+        if col in df.columns:
+            df = df.drop(columns=[col])
+
+    if df["Churn"].dtype == object:
+        df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
+    df["Churn"] = df["Churn"].astype(int)
+
+    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+    df["TotalCharges"] = df["TotalCharges"].fillna(df["TotalCharges"].median())
+
+    y = df["Churn"]
+    X = df.drop(columns=["Churn"])
+    return X, y
+
+
+def _lgbm_engineer(X_tr: pd.DataFrame, y_tr: pd.Series,
+                   X_val: pd.DataFrame,
+                   num_cols: list, cat_cols: list):
+    """
+    10-step feature engineering pipeline (fitted on X_tr, applied to both).
+    Steps:
+      1  Frequency encoding
+      2  OOF target encoding (uses this fold's y_tr – no leakage)
+      3  RobustScaler
+      4  KBins discretiser
+      5  OrdinalEncoder
+      6  Key pairwise categorical combinations
+      7  Interaction features (tenure×monthly, senior×monthly)
+      8  Polynomial features (degree 2 on numeric trio)
+      9  Ratio feature  (total / tenure)
+      10 Group aggregates (Contract / InternetService / PaymentMethod)
+    Returns: X_tr_eng, X_val_eng, cat_feature_names
+    """
+    Xc  = X_tr.copy()
+    Xvc = X_val.copy()
+    Xf  = pd.DataFrame(index=X_tr.index)
+    Xfv = pd.DataFrame(index=X_val.index)
+    cat_names = []
+    all_cols  = num_cols + cat_cols
+
+    # ── 1. Frequency encoding ────────────────────────────────────────────────
+    for col in all_cols:
+        if col in Xc.columns:
+            fm = Xc[col].value_counts(normalize=True).to_dict()
+            Xf[f"{col}_freq"]  = Xc[col].map(fm).fillna(0)
+            Xfv[f"{col}_freq"] = Xvc[col].map(fm).fillna(0)
+
+    # ── 2. Target encoding (OOF on this fold's training labels) ──────────────
+    gm   = float(y_tr.mean())
+    te_maps = {
+        col: y_tr.groupby(Xc[col]).mean().to_dict()
+        for col in all_cols if col in Xc.columns
+    }
+    for col in all_cols:
+        if col in Xc.columns:
+            Xf[f"{col}_target"]  = Xc[col].map(te_maps[col]).fillna(gm)
+            Xfv[f"{col}_target"] = Xvc[col].map(te_maps[col]).fillna(gm)
+
+    # ── 3. RobustScaler ──────────────────────────────────────────────────────
+    sc = RobustScaler()
+    sc_cols = [f"{c}_scaled" for c in num_cols]
+    Xf[sc_cols]  = sc.fit_transform(Xc[num_cols])
+    Xfv[sc_cols] = sc.transform(Xvc[num_cols])
+
+    # ── 4. KBins discretiser ─────────────────────────────────────────────────
+    bn = KBinsDiscretizer(n_bins=10, strategy="uniform", encode="ordinal", random_state=42)
+    bc = [f"{c}_bin" for c in num_cols]
+    Xf[bc]  = bn.fit_transform(Xc[num_cols]).astype(int)
+    Xfv[bc] = bn.transform(Xvc[num_cols]).astype(int)
+    cat_names.extend(bc)
+
+    # ── 5. OrdinalEncoder ────────────────────────────────────────────────────
+    oe = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)
+    oc = [f"{c}_ordinal" for c in cat_cols]
+    Xf[oc]  = oe.fit_transform(Xc[cat_cols]).astype(int)
+    Xfv[oc] = oe.transform(Xvc[cat_cols]).astype(int)
+    cat_names.extend(oc)
+
+    # ── 6. Key pairwise categorical combinations ──────────────────────────────
+    key_combos = [
+        ("Contract", "InternetService"),
+        ("Contract", "PaymentMethod"),
+        ("InternetService", "PaymentMethod"),
+    ]
+    for c1, c2 in key_combos:
+        if c1 in Xc.columns and c2 in Xc.columns:
+            nm = f"{c1}_x_{c2}"
+            Xf[nm]  = (Xc[c1].astype(str) + "_" + Xc[c2].astype(str)).astype("category")
+            Xfv[nm] = (Xvc[c1].astype(str) + "_" + Xvc[c2].astype(str)).astype("category")
+            cat_names.append(nm)
+
+    # ── 7. Interaction features ──────────────────────────────────────────────
+    Xf["tenure_x_monthly"]  = Xc["tenure"] * Xc["MonthlyCharges"]
+    Xfv["tenure_x_monthly"] = Xvc["tenure"] * Xvc["MonthlyCharges"]
+    Xf["senior_x_monthly"]  = Xc["SeniorCitizen"] * Xc["MonthlyCharges"]
+    Xfv["senior_x_monthly"] = Xvc["SeniorCitizen"] * Xvc["MonthlyCharges"]
+
+    # ── 8. Polynomial features (degree 2) ─────────────────────────────────────
+    pi = ["tenure", "MonthlyCharges", "TotalCharges"]
+    po = PolynomialFeatures(degree=2, include_bias=False)
+    pn = po.fit(Xc[pi]).get_feature_names_out(pi)
+    Xf[list(pn)]  = po.transform(Xc[pi])
+    Xfv[list(pn)] = po.transform(Xvc[pi])
+
+    # ── 9. Ratio feature ─────────────────────────────────────────────────────
+    eps = 1e-6
+    Xf["total_per_tenure"]  = Xc["TotalCharges"] / (Xc["tenure"].replace(0, np.nan).fillna(eps) + eps)
+    Xfv["total_per_tenure"] = Xvc["TotalCharges"] / (Xvc["tenure"].replace(0, np.nan).fillna(eps) + eps)
+
+    # ── 10. Group aggregates ──────────────────────────────────────────────────
+    for g in ("Contract", "InternetService", "PaymentMethod"):
+        if g not in Xc.columns:
+            continue
+        for nc in num_cols:
+            for m in ("mean", "median", "std"):
+                cn = f"{nc}_by_{g}_{m}"
+                Xf[cn]  = Xc.groupby(g)[nc].transform(m).fillna(0)
+                mp = Xc.groupby(g)[nc].agg(m).to_dict()
+                Xfv[cn] = Xvc[g].map(mp).fillna(float(Xf[cn].mean()))
+
+    # Ensure category dtype for all categorical feature names
+    for col in cat_names:
+        for frame in (Xf, Xfv):
+            if col in frame.columns and frame[col].dtype.name != "category":
+                frame[col] = frame[col].astype(str).astype("category")
+
+    return Xf, Xfv, cat_names
+
+
+def train_lightgbm(raw_df: pd.DataFrame, skf):
+    """
+    LightGBM with 10-step feature engineering and OOF CV.
+    Threshold is chosen to maximise Matthews Correlation Coefficient.
+    Feature importances come from a final full-data fit.
+    """
+    print("\n[→] Training LightGBM (5-fold CV + 10-step feature engineering) …")
+
+    X_raw, y = _lgbm_prepare_raw(raw_df)
+    params = {k: v for k, v in LGBM_PARAMS.items() if k not in ("n_jobs", "verbose")}
+    params.update({"n_jobs": -1, "verbose": -1})
+    early_stop = 300
+
+    y_prob_oof = np.zeros(len(y))
+    fold_scores = []
+    feat_names_final = None
+
+    for fold_i, (train_idx, val_idx) in enumerate(skf.split(X_raw, y), 1):
+        X_tr_raw = X_raw.iloc[train_idx]
+        y_tr     = y.iloc[train_idx]
+        X_val_raw = X_raw.iloc[val_idx]
+        y_val     = y.iloc[val_idx]
+
+        X_tr_eng, X_val_eng, cat_names = _lgbm_engineer(
+            X_tr_raw, y_tr, X_val_raw, LGBM_NUM_COLUMNS, LGBM_CAT_COLUMNS
+        )
+        if feat_names_final is None:
+            feat_names_final = X_tr_eng.columns.tolist()
+
+        lgb_cats = [
+            c for c in X_tr_eng.columns
+            if X_tr_eng[c].dtype.name == "category" or X_tr_eng[c].dtype == object
+        ]
+        model = lgb.LGBMClassifier(**params)
+        fit_kw = {
+            "eval_set": [(X_val_eng, y_val)],
+            "callbacks": [
+                lgb.early_stopping(stopping_rounds=early_stop, verbose=False),
+                lgb.log_evaluation(period=-1),
+            ],
+        }
+        if lgb_cats:
+            fit_kw["categorical_feature"] = lgb_cats
+
+        model.fit(X_tr_eng, y_tr, **fit_kw)
+
+        prob = model.predict_proba(X_val_eng)[:, 1]
+        y_prob_oof[val_idx] = prob
+
+        fa  = roc_auc_score(y_val, prob)
+        acc = accuracy_score(y_val, (prob >= 0.5).astype(int))
+        f1  = f1_score(y_val, (prob >= 0.5).astype(int), zero_division=0)
+        fold_scores.append({
+            "fold": fold_i,
+            "accuracy": round(float(acc), 4),
+            "f1":       round(float(f1),  4),
+            "roc_auc":  round(float(fa),  4),
+        })
+        print(f"    Fold {fold_i}  AUC={fa:.5f}")
+
+    # ── Optimal threshold via MCC grid search ─────────────────────────────────
+    best_mcc, best_thresh = -np.inf, 0.5
+    for t in np.arange(0.05, 0.96, 0.01):
+        mcc = matthews_corrcoef(y, (y_prob_oof >= t).astype(int))
+        if mcc > best_mcc:
+            best_mcc, best_thresh = mcc, float(t)
+
+    y_pred_oof = (y_prob_oof >= best_thresh).astype(int)
+    metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
+
+    # ── Full-data fit for feature importances ─────────────────────────────────
+    X_full, _, cat_names_full = _lgbm_engineer(
+        X_raw, y, X_raw.iloc[:5], LGBM_NUM_COLUMNS, LGBM_CAT_COLUMNS
+    )
+    lgb_cats_full = [
+        c for c in X_full.columns
+        if X_full[c].dtype.name == "category" or X_full[c].dtype == object
+    ]
+    model_full = lgb.LGBMClassifier(**params)
+    fkw_full = {}
+    if lgb_cats_full:
+        fkw_full["categorical_feature"] = lgb_cats_full
+    model_full.fit(X_full, y, **fkw_full)
+
+    fi = model_full.feature_importances_
+    fi_pairs = sorted(
+        zip(X_full.columns.tolist(), fi.tolist()), key=lambda x: x[1], reverse=True
+    )
+    feature_importance = [
+        {"feature": f, "importance": round(float(v), 5)} for f, v in fi_pairs
+    ]
+
+    display_params = {
+        k: v for k, v in LGBM_PARAMS.items() if k not in ("n_jobs", "verbose")
+    }
+    display_params["optimal_threshold"] = round(best_thresh, 4)
+    display_params["best_mcc"]          = round(float(best_mcc), 4)
+
+    print(
+        f"[✓] LightGBM (OOF, thresh={best_thresh:.2f}) — "
+        f"Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, "
+        f"F1: {metrics['f1']:.4f}  |  n_features={X_full.shape[1]}"
+    )
+    return {
+        "params":             display_params,
+        "n_features":         int(X_full.shape[1]),
+        "feature_importance": feature_importance,
+        "fold_scores":        fold_scores,
+        "metrics":            metrics,
+        "_oof_probs":         y_prob_oof,
+    }
+
+
+# ─────────────────────────────────────────────
 # 6. MAIN ORCHESTRATION
 # ─────────────────────────────────────────────
 
@@ -683,13 +956,15 @@ def main():
     lr_results     = train_logistic_regression(X, y, skf)
     rf_results     = train_random_forest(X, y, feature_names, skf)
     linreg_results = train_linear_regression_as_classifier(X, y, skf)
+    lgbm_results   = train_lightgbm(raw_df.copy(), skf)
 
-    # Blend using OOF probs
+    # Blend using OOF probs (all 5 models)
     model_probs = {
         "xgboost":             xgb_results.pop("_oof_probs"),
         "logistic_regression": lr_results.pop("_oof_probs"),
         "random_forest":       rf_results.pop("_oof_probs"),
         "linear_regression":   linreg_results.pop("_oof_probs"),
+        "lightgbm":            lgbm_results.pop("_oof_probs"),
     }
     blend_results = blend_models(y, model_probs)
 
@@ -701,6 +976,7 @@ def main():
         "logistic_regression": compute_score_bands(y, model_probs["logistic_regression"]),
         "random_forest":       compute_score_bands(y, model_probs["random_forest"]),
         "linear_regression":   compute_score_bands(y, model_probs["linear_regression"]),
+        "lightgbm":            compute_score_bands(y, model_probs["lightgbm"]),
         "blend_simple":        compute_score_bands(y, blend_simple_probs),
         "blend_auc_weighted":  compute_score_bands(y, blend_auc_probs),
     }
@@ -709,6 +985,7 @@ def main():
     lr_results["score_bands"]                = score_bands["logistic_regression"]
     rf_results["score_bands"]                = score_bands["random_forest"]
     linreg_results["score_bands"]            = score_bands["linear_regression"]
+    lgbm_results["score_bands"]              = score_bands["lightgbm"]
     blend_results["simple_blend"]["score_bands"]       = score_bands["blend_simple"]
     blend_results["auc_weighted_blend"]["score_bands"] = score_bands["blend_auc_weighted"]
 
@@ -725,6 +1002,7 @@ def main():
         {"model": "Random Forest",        **rf_results["metrics"]},
         {"model": "Logistic Regression",  **lr_results["metrics"]},
         {"model": "Linear Regression",    **linreg_results["metrics"]},
+        {"model": "LightGBM",             **lgbm_results["metrics"]},
         {"model": "Blend (Simple Avg)",   **blend_results["simple_blend"]["metrics"]},
         {"model": "Blend (AUC-Weighted)", **blend_results["auc_weighted_blend"]["metrics"]},
     ]
@@ -751,6 +1029,7 @@ def main():
             "logistic_regression": lr_results,
             "random_forest":       rf_results,
             "linear_regression":   linreg_results,
+            "lightgbm":            lgbm_results,
         },
         "blend":            blend_results,
         "model_comparison": model_comparison,
@@ -779,6 +1058,7 @@ def main():
     for row in model_comparison:
         print(f"  {row['model']:26s}  Acc={row['accuracy']:.4f}  "
               f"AUC={row['roc_auc']:.4f}  F1={row['f1']:.4f}")
+    print(f"\n  LightGBM engineered features: {lgbm_results['n_features']}")
     print("=" * 60)
 
 

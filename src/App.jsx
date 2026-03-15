@@ -122,6 +122,7 @@ function ModelToggle({ active, onChange, showBlend = false }) {
     { id: "rf",     label: "Random Forest" },
     { id: "lr",     label: "Logistic Reg." },
     { id: "linreg", label: "Linear Reg." },
+    { id: "lgbm",   label: "LightGBM" },
     ...(showBlend ? [{ id: "blend", label: "Equal Blend" }, { id: "wblend", label: "AUC-Weighted" }] : []),
   ];
   return (
@@ -571,12 +572,13 @@ function ModelSection({ data }) {
       <SectionHeading>2. Model Training</SectionHeading>
 
       <P>
-        Four models are trained and compared: <strong>XGBoost</strong> (gradient-boosted trees),{" "}
+        Five models are trained and compared: <strong>XGBoost</strong> (gradient-boosted trees),{" "}
         <strong>Random Forest</strong> (bagged decision trees), <strong>Logistic Regression</strong> (linear
-        classifier), and <strong>Linear Regression</strong> repurposed as a probabilistic classifier. All are
-        evaluated via <strong>{data.meta.cv_folds}-fold stratified cross-validation</strong> on the{" "}
-        {data.meta.train_samples.toLocaleString()}-sample training set. Two blended ensembles average the
-        out-of-fold probabilities from all four base models.
+        classifier), <strong>Linear Regression</strong> repurposed as a probabilistic classifier, and{" "}
+        <strong>LightGBM</strong> (histogram-based gradient boosting with a 10-step feature engineering
+        pipeline). All are evaluated via <strong>{data.meta.cv_folds}-fold stratified cross-validation</strong>{" "}
+        on the {data.meta.train_samples.toLocaleString()}-sample training set. Two blended ensembles average
+        the out-of-fold probabilities from all five base models.
       </P>
 
       <SubHeading>XGBoost</SubHeading>
@@ -804,6 +806,108 @@ function ModelSection({ data }) {
         <span>)</span>
       </CodeBlock>
 
+      <SubHeading>LightGBM + 10-Step Feature Engineering</SubHeading>
+
+      <P>
+        LightGBM uses a histogram-based split-finding algorithm that is significantly faster than
+        exact-split GBDT and performs well on high-cardinality categorical features natively.
+        Rather than using the standard cleaning pipeline, this model applies a dedicated{" "}
+        <strong>10-step feature engineering pipeline</strong> derived from a high-scoring Kaggle
+        approach, producing <strong>{data.models.lightgbm?.n_features ?? 112} engineered features</strong>{" "}
+        from the original {data.dataset_stats.total_cols} raw columns. The decision threshold is
+        chosen by grid-searching for the value that maximises the{" "}
+        <strong>Matthews Correlation Coefficient (MCC)</strong> on OOF predictions — a better single
+        metric for imbalanced binary classification than accuracy or F1 alone.
+      </P>
+
+      <Callout color="#f9fafb" border="#d1d5db">
+        <strong>10-step pipeline:</strong>{" "}
+        (1) Frequency encoding →
+        (2) OOF target encoding →
+        (3) RobustScaler →
+        (4) KBins discretiser (10 bins) →
+        (5) OrdinalEncoder →
+        (6) Key pairwise categorical combinations (Contract×Internet, Contract×Payment, Internet×Payment) →
+        (7) Interaction features (tenure×MonthlyCharges, SeniorCitizen×MonthlyCharges) →
+        (8) Degree-2 polynomial features on numeric trio →
+        (9) Ratio feature (TotalCharges / tenure) →
+        (10) Group aggregates (mean / median / std of numerics by Contract, InternetService, PaymentMethod)
+      </Callout>
+
+      <CodeBlock>
+        <span style={{ color: "#c586c0" }}>import</span>
+        <span style={{ color: "#4ec9b0" }}> lightgbm </span>
+        <span style={{ color: "#c586c0" }}>as</span>
+        <span> lgb{"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Params from Kaggle Playground S6E3 notebook (AUC = 0.91367)</span>
+        <span>{"\n"}</span>
+        <span>params = &#123;{"\n"}</span>
+        <span>{"    "}</span>
+        <span style={{ color: "#ce9178" }}>"objective"</span>
+        <span>: </span>
+        <span style={{ color: "#ce9178" }}>"binary"</span>
+        <span>, </span>
+        <span style={{ color: "#ce9178" }}>"metric"</span>
+        <span>: </span>
+        <span style={{ color: "#ce9178" }}>"auc"</span>
+        <span>,{"\n"}{"    "}</span>
+        <span style={{ color: "#ce9178" }}>"n_estimators"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>3000</span>
+        <span>, </span>
+        <span style={{ color: "#ce9178" }}>"learning_rate"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>0.02</span>
+        <span>,{"\n"}{"    "}</span>
+        <span style={{ color: "#ce9178" }}>"num_leaves"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>20</span>
+        <span>, </span>
+        <span style={{ color: "#ce9178" }}>"max_depth"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>4</span>
+        <span>,{"\n"}{"    "}</span>
+        <span style={{ color: "#ce9178" }}>"subsample"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>0.7</span>
+        <span>, </span>
+        <span style={{ color: "#ce9178" }}>"colsample_bytree"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>0.7</span>
+        <span>,{"\n"}{"    "}</span>
+        <span style={{ color: "#ce9178" }}>"early_stopping_round"</span>
+        <span>: </span>
+        <span style={{ color: "#b5cea8" }}>300</span>
+        <span>{"\n"}&#125;{"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Optimal threshold via MCC grid search (instead of fixed 0.5)</span>
+        <span>{"\n"}</span>
+        <span>best_mcc, best_t = -np.inf, </span>
+        <span style={{ color: "#b5cea8" }}>0.5</span>
+        <span>{"\n"}</span>
+        <span style={{ color: "#c586c0" }}>for</span>
+        <span> t </span>
+        <span style={{ color: "#c586c0" }}>in</span>
+        <span> np.</span>
+        <span style={{ color: "#dcdcaa" }}>arange</span>
+        <span>(</span>
+        <span style={{ color: "#b5cea8" }}>0.05</span>
+        <span>, </span>
+        <span style={{ color: "#b5cea8" }}>0.96</span>
+        <span>, </span>
+        <span style={{ color: "#b5cea8" }}>0.01</span>
+        <span>):{"\n"}</span>
+        <span>{"    "}mcc = </span>
+        <span style={{ color: "#dcdcaa" }}>matthews_corrcoef</span>
+        <span>(y_oof, (oof_probs {">="} t).</span>
+        <span style={{ color: "#dcdcaa" }}>astype</span>
+        <span>(</span>
+        <span style={{ color: "#4ec9b0" }}>int</span>
+        <span>)){"\n"}</span>
+        <span>{"    "}</span>
+        <span style={{ color: "#c586c0" }}>if</span>
+        <span> mcc {">"} best_mcc: best_mcc, best_t = mcc, t</span>
+      </CodeBlock>
+
       <SubHeading>XGBoost Training Loss</SubHeading>
 
       <P>
@@ -832,7 +936,7 @@ function ModelSection({ data }) {
         { n: data.meta.train_samples.toLocaleString(), l: "Training Samples" },
         { n: data.meta.n_features, l: "Input Features" },
         { n: `${data.meta.cv_folds}-fold`, l: "Cross-Validation" },
-        { n: "4", l: "Base Models" },
+        { n: "5", l: "Base Models" },
       ]} />
 
       <SubHeading>Cross-Validation Fold Scores</SubHeading>
@@ -847,6 +951,7 @@ function ModelSection({ data }) {
           { key: "random_forest",      label: "Random Forest" },
           { key: "logistic_regression",label: "Logistic Reg." },
           { key: "linear_regression",  label: "Linear Reg." },
+          { key: "lightgbm",           label: "LightGBM" },
         ];
         const foldCount = data.meta.cv_folds;
         const metrics = ["accuracy", "f1", "roc_auc"];
@@ -920,6 +1025,7 @@ function ResultsSection({ data }) {
     rf:     data.models.random_forest,
     lr:     data.models.logistic_regression,
     linreg: data.models.linear_regression,
+    lgbm:   data.models.lightgbm,
     blend:  data.blend.simple_blend,
     wblend: data.blend.auc_weighted_blend,
   };
@@ -928,6 +1034,7 @@ function ResultsSection({ data }) {
     rf:     "Random Forest",
     lr:     "Logistic Regression",
     linreg: "Linear Regression",
+    lgbm:   "LightGBM",
     blend:  "Blended (Equal Avg)",
     wblend: "Blended (AUC-Weighted)",
   };
@@ -951,6 +1058,7 @@ function ResultsSection({ data }) {
     ["Random Forest", data.models.random_forest.metrics],
     ["Logistic Reg.", data.models.logistic_regression.metrics],
     ["Linear Reg.",   data.models.linear_regression.metrics],
+    ...(data.models.lightgbm ? [["LightGBM", data.models.lightgbm.metrics]] : []),
     ["Equal Blend",   data.blend.simple_blend.metrics],
     ["AUC-Wtd Blend", data.blend.auc_weighted_blend.metrics],
   ];
@@ -1293,6 +1401,7 @@ function ConclusionSection({ data }) {
     rf:     data.models.random_forest,
     lr:     data.models.logistic_regression,
     linreg: data.models.linear_regression,
+    lgbm:   data.models.lightgbm,
     blend:  data.blend.simple_blend,
     wblend: data.blend.auc_weighted_blend,
   };
@@ -1301,18 +1410,20 @@ function ConclusionSection({ data }) {
     rf:     "Random Forest",
     lr:     "Logistic Regression",
     linreg: "Linear Regression",
+    lgbm:   "LightGBM",
     blend:  "Blended (Equal Avg)",
     wblend: "Blended (AUC-Weighted)",
   };
 
-  const m           = modelMap[activeModel];
-  const modelName   = nameMap[activeModel];
+  const m           = modelMap[activeModel] ?? modelMap["xgb"];
+  const modelName   = nameMap[activeModel]  ?? "XGBoost";
   const topFeatures = (m.feature_importance || []).slice(0, 10);
 
   const xgbM  = data.models.xgboost.metrics;
   const rfM   = data.models.random_forest.metrics;
   const lrM   = data.models.logistic_regression.metrics;
   const linM  = data.models.linear_regression.metrics;
+  const lgbmM = data.models.lightgbm?.metrics;
   const bM    = data.blend.simple_blend.metrics;
   const wbM   = data.blend.auc_weighted_blend.metrics;
 
@@ -1327,16 +1438,16 @@ function ConclusionSection({ data }) {
       <SectionHeading>4. Summary & Interpretation</SectionHeading>
 
       <P>
-        All four models achieve broadly comparable performance on this imbalanced dataset ({" "}
+        Five models are compared on this imbalanced dataset ({" "}
         <strong>{(data.dataset_stats.churn_rate * 100).toFixed(1)}% churn rate</strong>,{" "}
-        {data.meta.train_samples.toLocaleString()} customers, {data.meta.n_features} features,{" "}
-        {data.meta.cv_folds}-fold stratified CV). AUC scores range from{" "}
-        <strong>{Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc).toFixed(4)}</strong> to{" "}
-        <strong>{Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc).toFixed(4)}</strong>,
-        with F1 scores between{" "}
-        <strong>{(Math.min(xgbM.f1, rfM.f1, lrM.f1, linM.f1) * 100).toFixed(1)}%</strong> and{" "}
-        <strong>{(Math.max(xgbM.f1, rfM.f1, lrM.f1, linM.f1) * 100).toFixed(1)}%</strong>.
-        The blended ensembles are the top performers overall.
+        {data.meta.train_samples.toLocaleString()} customers, {data.meta.cv_folds}-fold stratified CV).
+        AUC scores across all base models range from{" "}
+        <strong>{Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? Infinity).toFixed(4)}</strong> to{" "}
+        <strong>{Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 0).toFixed(4)}</strong>.
+        LightGBM uses <strong>{data.models.lightgbm?.n_features ?? 112} engineered features</strong> vs.{" "}
+        {data.meta.n_features} for the other models, and optimises its decision threshold for MCC
+        rather than using a fixed 0.5 cutoff. The blended ensembles combine OOF probabilities from
+        all five base models.
       </P>
 
       <Callout color="#faf5ff" border="#8b5cf6">
@@ -1506,6 +1617,7 @@ export default function App() {
   const rfAcc     = (data.models.random_forest.metrics.accuracy * 100).toFixed(1);
   const lrAcc     = (data.models.logistic_regression.metrics.accuracy * 100).toFixed(1);
   const linAcc    = (data.models.linear_regression.metrics.accuracy * 100).toFixed(1);
+  const lgbmAuc   = data.models.lightgbm ? data.models.lightgbm.metrics.roc_auc.toFixed(4) : null;
   const blendAcc  = (data.blend.simple_blend.metrics.accuracy * 100).toFixed(1);
   const wblendAcc = (data.blend.auc_weighted_blend.metrics.accuracy * 100).toFixed(1);
 
@@ -1529,9 +1641,9 @@ export default function App() {
             <span><strong style={{ color: "#111" }}>{rfAcc}%</strong> Random Forest</span>
             <span><strong style={{ color: "#111" }}>{lrAcc}%</strong> Logistic Reg.</span>
             <span><strong style={{ color: "#111" }}>{linAcc}%</strong> Linear Reg.</span>
+            {lgbmAuc && <span><strong style={{ color: "#111" }}>{lgbmAuc}</strong> LightGBM AUC</span>}
             <span><strong style={{ color: "#111" }}>{blendAcc}%</strong> Equal Blend</span>
             <span><strong style={{ color: "#111" }}>{wblendAcc}%</strong> AUC-Weighted</span>
-            <span><strong style={{ color: "#111" }}>{data.meta.n_features}</strong> features</span>
             <span><strong style={{ color: "#111" }}>{data.meta.cv_folds}-fold</strong> CV</span>
           </div>
         </div>
@@ -1550,7 +1662,7 @@ export default function App() {
       </main>
 
       <footer style={{ borderTop: "1px solid #eee", textAlign: "center", padding: "32px 24px", ...sans, fontSize: "10px", color: "#bbb" }}>
-        Kaggle S6E3: Customer Churn Prediction — XGBoost · Random Forest · Logistic Regression · Linear Regression · Blended Ensembles
+        Kaggle S6E3: Customer Churn Prediction — XGBoost · Random Forest · Logistic Regression · Linear Regression · LightGBM · Blended Ensembles
       </footer>
     </div>
   );
