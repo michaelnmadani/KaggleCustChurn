@@ -188,6 +188,11 @@ CLEANING_STEPS = [
         "description": "Combine Partner and Dependents into a single flag: HasFamilyTies = 1 when both Partner='Yes' AND Dependents='Yes'. Computed before label-encoding so the string values are still readable.",
         "code": "df['HasFamilyTies'] = ((df['Partner'] == 'Yes') & (df['Dependents'] == 'Yes')).astype(int)"
     },
+    {
+        "step": "Log-transform tenure",
+        "description": "Apply log1p to the raw tenure (months) column to compress its right-skewed range. New customers (tenure=0) map to 0; long-tenure customers are pulled in, giving linear models a better signal.",
+        "code": "df['log_tenure'] = np.log1p(df['tenure'])"
+    },
 ]
 
 
@@ -223,6 +228,9 @@ def clean_data(df: pd.DataFrame):
             (df["Partner"].astype(str).str.strip().str.lower() == "yes") &
             (df["Dependents"].astype(str).str.strip().str.lower() == "yes")
         ).astype(int)
+
+    # ── Log-transform tenure ──
+    df["log_tenure"] = np.log1p(df["tenure"])
 
     # ── One-hot encode all remaining categorical columns ──
     cat_cols = df.select_dtypes(include="object").columns.tolist()
