@@ -151,6 +151,112 @@ function ModelToggle({ active, onChange, showBlend = false }) {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SECTION 0 — Introduction
+═══════════════════════════════════════════════════════════ */
+
+function IntroSection({ data }) {
+  return (
+    <section>
+      <SectionHeading>0. Background & Data Source</SectionHeading>
+
+      <SubHeading>What is Kaggle?</SubHeading>
+
+      <P>
+        <a href="https://www.kaggle.com" target="_blank" rel="noreferrer" style={{ color: "#111", fontWeight: 600 }}>Kaggle</a> is
+        an online platform for data science competitions, public datasets, and shared notebooks.
+        It is owned by Google and hosts thousands of competitions ranging from beginner-friendly
+        exercises to high-stakes industry challenges with cash prizes. Competitors download a
+        provided dataset, build a predictive model, and submit predictions to a public leaderboard
+        that scores them against a hidden test set.
+      </P>
+
+      <P>
+        Alongside full competitions, Kaggle runs a continuous series called{" "}
+        <strong>Playground Series</strong> — shorter, lower-stakes exercises designed for
+        learning and experimentation. Each episode (identified by season and episode number)
+        ships a synthetic-but-realistic tabular dataset based on a real-world problem.
+      </P>
+
+      <SubHeading>This Dataset — Playground Series S6E3</SubHeading>
+
+      <P>
+        Season 6, Episode 3 of the Playground Series focuses on{" "}
+        <strong>customer churn prediction</strong> for a telecommunications company.
+        The dataset is synthetically generated from the well-known{" "}
+        <strong>IBM Telco Customer Churn</strong> dataset (originally published on the
+        IBM Watson Analytics community), which describes ~7,000 customers of a fictional
+        US telco with demographic details, service subscriptions, billing information,
+        and a binary churn label.
+      </P>
+
+      <P>
+        The Kaggle version expands this to{" "}
+        <strong>{data.meta.train_samples.toLocaleString()} labelled customers</strong> generated
+        via a deep-learning synthesiser trained on the original IBM data, preserving realistic
+        correlations between features while preventing direct copying. Each row represents one
+        customer account.
+      </P>
+
+      <Callout color="#f9fafb" border="#d1d5db">
+        <strong>Competition URL:</strong>{" "}
+        <a href="https://www.kaggle.com/competitions/playground-series-s6e3" target="_blank" rel="noreferrer" style={{ color: "#111" }}>
+          kaggle.com/competitions/playground-series-s6e3
+        </a>
+        <br />
+        <strong>Original IBM dataset:</strong>{" "}
+        <a href="https://www.kaggle.com/datasets/blastchar/telco-customer-churn" target="_blank" rel="noreferrer" style={{ color: "#111" }}>
+          kaggle.com/datasets/blastchar/telco-customer-churn
+        </a>
+      </Callout>
+
+      <SubHeading>Feature Overview</SubHeading>
+
+      <P>
+        The raw dataset contains <strong>{data.dataset_stats.total_cols} columns</strong> across
+        demographic, service, and billing categories:
+      </P>
+
+      <Figure>
+        <div style={{ overflowX: "auto", border: "1px solid #e6e6e6", borderRadius: "6px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", ...sans }}>
+            <thead>
+              <tr>
+                <th style={thStyle}>Category</th>
+                <th style={thStyle}>Features</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Demographics",   "gender, SeniorCitizen, Partner, Dependents"],
+                ["Account",        "tenure (months), Contract, PaperlessBilling, PaymentMethod"],
+                ["Billing",        "MonthlyCharges, TotalCharges"],
+                ["Phone services", "PhoneService, MultipleLines"],
+                ["Internet",       "InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies"],
+                ["Target",         "Churn — Yes / No"],
+              ].map(([cat, feats], i) => (
+                <tr key={cat} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
+                  <td style={{ ...tdStyle, fontWeight: 600, color: "#222", whiteSpace: "nowrap" }}>{cat}</td>
+                  <td style={{ ...tdStyle, color: "#555" }}>{feats}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Figure>
+
+      <StatRow items={[
+        { n: data.meta.train_samples.toLocaleString(), l: "Customers" },
+        { n: data.dataset_stats.total_cols,            l: "Raw columns" },
+        { n: data.meta.n_features,                     l: "Engineered features" },
+        { n: `${(data.dataset_stats.churn_rate * 100).toFixed(1)}%`, l: "Churn rate" },
+        { n: `${data.dataset_stats.class_distribution.Yes.toLocaleString()}`, l: "Churned" },
+        { n: `${data.dataset_stats.class_distribution.No.toLocaleString()}`,  l: "Retained" },
+      ]} />
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    SECTION 1 — Data Cleaning & Feature Engineering
 ═══════════════════════════════════════════════════════════ */
 
@@ -1432,6 +1538,8 @@ export default function App() {
       </header>
 
       <main style={{ maxWidth: "720px", margin: "0 auto", padding: "0 24px 80px" }}>
+        <IntroSection data={data} />
+        <Divider />
         <CleaningSection data={data} />
         <Divider />
         <ModelSection data={data} />
