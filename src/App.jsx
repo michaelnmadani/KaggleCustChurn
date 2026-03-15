@@ -972,6 +972,78 @@ function ResultsSection({ data }) {
         </div>
       </Figure>
 
+      <SubHeading>Prediction Score Bands — {modelName}</SubHeading>
+
+      {(() => {
+        const bandKeyMap = {
+          xgb:    "xgboost",
+          rf:     "random_forest",
+          lr:     "logistic_regression",
+          linreg: "linear_regression",
+          blend:  "blend_simple",
+          wblend: "blend_auc_weighted",
+        };
+        const bands = (data.score_bands ?? {})[bandKeyMap[activeModel]] ?? [];
+        const totalCustomers = bands.reduce((s, b) => s + b.customers, 0);
+        const baseRate = data.dataset_stats?.churn_rate ?? null;
+        const maxChurn = Math.max(...bands.map(b => b.actual_churn_pct ?? 0), 1);
+        return (
+          <Figure>
+            <div style={{ overflowX: "auto", border: "1px solid #e6e6e6", borderRadius: "6px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", ...sans }}>
+                <thead>
+                  <tr>
+                    {["Predicted Band", "Customers", "% of Total", "Actual Churn %", "Lift vs Base"].map(h => (
+                      <th key={h} style={thStyle}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {bands.map((row, i) => {
+                    const pctOfTotal = totalCustomers > 0
+                      ? ((row.customers / totalCustomers) * 100).toFixed(1) + "%"
+                      : "—";
+                    const lift = baseRate && row.actual_churn_pct != null
+                      ? (row.actual_churn_pct / 100 / baseRate).toFixed(2) + "×"
+                      : "—";
+                    const barPct = row.actual_churn_pct != null
+                      ? Math.round((row.actual_churn_pct / maxChurn) * 100)
+                      : 0;
+                    return (
+                      <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
+                        <td style={{ ...tdStyle, fontWeight: 600, color: "#222" }}>{row.band}</td>
+                        <td style={{ ...tdStyle, textAlign: "right" }}>{row.customers.toLocaleString()}</td>
+                        <td style={{ ...tdStyle, textAlign: "right", color: "#666" }}>{pctOfTotal}</td>
+                        <td style={{ ...tdStyle }}>
+                          {row.actual_churn_pct != null ? (
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <div style={{ flex: 1, background: "#e5e7eb", borderRadius: "4px", height: "6px", minWidth: "60px" }}>
+                                <div style={{ width: `${barPct}%`, background: "#059669", height: "6px", borderRadius: "4px" }} />
+                              </div>
+                              <span style={{ fontWeight: 700, color: "#111", minWidth: "40px", textAlign: "right" }}>
+                                {row.actual_churn_pct.toFixed(1)}%
+                              </span>
+                            </div>
+                          ) : "—"}
+                        </td>
+                        <td style={{
+                          ...tdStyle, textAlign: "right", fontWeight: 700,
+                          color: lift !== "—" && parseFloat(lift) >= 2 ? "#059669"
+                               : lift !== "—" && parseFloat(lift) >= 1 ? "#111"
+                               : "#999",
+                        }}>
+                          {lift}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Figure>
+        );
+      })()}
+
       <SubHeading>{modelName} — ROC & Calibration</SubHeading>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px", marginBottom: "28px" }}>
