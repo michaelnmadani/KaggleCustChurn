@@ -964,17 +964,17 @@ def main():
     linreg_results = train_linear_regression_as_classifier(X, y, skf)
     lgbm_results   = train_lightgbm(raw_df.copy(), skf)
 
-    # Blend using OOF probs (all 5 models)
+    # Blend using OOF probs (original 4 models only; LightGBM excluded)
+    lgbm_oof = lgbm_results.pop("_oof_probs")
     model_probs = {
         "xgboost":             xgb_results.pop("_oof_probs"),
         "logistic_regression": lr_results.pop("_oof_probs"),
         "random_forest":       rf_results.pop("_oof_probs"),
         "linear_regression":   linreg_results.pop("_oof_probs"),
-        "lightgbm":            lgbm_results.pop("_oof_probs"),
     }
     blend_results = blend_models(y, model_probs)
 
-    # ── Score band analysis (OOF probs for all 6 models) ──
+    # ── Score band analysis (OOF probs for all models + both blends) ──
     blend_simple_probs = blend_results.pop("_simple_oof_probs")
     blend_auc_probs    = blend_results.pop("_auc_oof_probs")
     score_bands = {
@@ -982,7 +982,7 @@ def main():
         "logistic_regression": compute_score_bands(y, model_probs["logistic_regression"]),
         "random_forest":       compute_score_bands(y, model_probs["random_forest"]),
         "linear_regression":   compute_score_bands(y, model_probs["linear_regression"]),
-        "lightgbm":            compute_score_bands(y, model_probs["lightgbm"]),
+        "lightgbm":            compute_score_bands(y, lgbm_oof),
         "blend_simple":        compute_score_bands(y, blend_simple_probs),
         "blend_auc_weighted":  compute_score_bands(y, blend_auc_probs),
     }
