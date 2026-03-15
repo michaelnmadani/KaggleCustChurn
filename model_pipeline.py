@@ -20,7 +20,7 @@ from sklearn.base import clone
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -164,9 +164,14 @@ CLEANING_STEPS = [
         "code": "if df['Churn'].dtype == object: df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})"
     },
     {
-        "step": "Label-encode categorical features",
-        "description": "Apply LabelEncoder to all object-dtype columns. This converts string categories to integer codes understood by tree models.",
-        "code": "for col in cat_cols: df[col] = LabelEncoder().fit_transform(df[col])"
+        "step": "Log-transform TotalCharges",
+        "description": "Apply log1p to TotalCharges to reduce right-skew. log1p handles zero-tenure customers safely (log(1+0)=0).",
+        "code": "df['TotalCharges'] = np.log1p(df['TotalCharges'])"
+    },
+    {
+        "step": "One-hot encode categorical features",
+        "description": "Apply pd.get_dummies to all object-dtype columns with drop_first=True to avoid multicollinearity. Produces binary indicator columns for each category level.",
+        "code": "df = pd.get_dummies(df, columns=cat_cols, drop_first=True)"
     },
     {
         "step": "Feature scaling (Logistic Regression / Linear Regression only)",
@@ -204,6 +209,10 @@ def clean_data(df: pd.DataFrame):
     imputer = SimpleImputer(strategy="median")
     df[num_cols] = imputer.fit_transform(df[num_cols])
 
+    # ── Log-transform TotalCharges (after imputation so no NaN) ──
+    if "TotalCharges" in df.columns:
+        df["TotalCharges"] = np.log1p(df["TotalCharges"])
+
     # ── Feature flags (computed while Partner/Dependents are still "Yes"/"No" strings) ──
     df["TenureShort"] = (df["tenure"] < 10).astype(int)
     df["TenureMid"]   = ((df["tenure"] >= 11) & (df["tenure"] <= 20)).astype(int)
@@ -215,10 +224,15 @@ def clean_data(df: pd.DataFrame):
             (df["Dependents"].astype(str).str.strip().str.lower() == "yes")
         ).astype(int)
 
+    # ── One-hot encode all remaining categorical columns ──
     cat_cols = df.select_dtypes(include="object").columns.tolist()
-    le = LabelEncoder()
-    for col in cat_cols:
-        df[col] = le.fit_transform(df[col].astype(str))
+    if cat_cols:
+        df = pd.get_dummies(df, columns=cat_cols, drop_first=True)
+    # Cast bool dummy columns to int and fill any residual NaN with 0
+    bool_cols = df.select_dtypes(include="bool").columns.tolist()
+    if bool_cols:
+        df[bool_cols] = df[bool_cols].astype(int)
+    df = df.fillna(0)
 
     y = df["Churn"].values
     X = df.drop(columns=["Churn"])
