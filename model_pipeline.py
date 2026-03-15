@@ -419,7 +419,13 @@ def train_random_forest(X, y, feature_names, skf):
 
     model_cv = RandomForestClassifier(**rf_params)
     y_prob_oof, fold_scores = _cv_fold_proba(model_cv, X, y, skf)
-    y_pred_oof = (y_prob_oof >= 0.5).astype(int)
+
+    # Global Youden's J threshold on OOF predictions (avoids threshold miscalibration from SMOTE)
+    fpr_arr, tpr_arr, thresh_arr = roc_curve(y, y_prob_oof)
+    best_idx = int(np.argmax(tpr_arr - fpr_arr))
+    best_threshold = float(thresh_arr[best_idx])
+
+    y_pred_oof = (y_prob_oof >= best_threshold).astype(int)
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
     # Full fit for feature importance (SMOTE on full training set)
@@ -432,7 +438,7 @@ def train_random_forest(X, y, feature_names, skf):
         {"feature": f, "importance": round(float(v), 5)} for f, v in fi_pairs
     ]
 
-    print(f"[✓] Random Forest (OOF) — Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
+    print(f"[✓] Random Forest (OOF, thresh={best_threshold:.3f}) — Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, F1: {metrics['f1']:.4f}")
     return {"params": rf_params, "feature_importance": feature_importance, "fold_scores": fold_scores, "metrics": metrics, "_oof_probs": y_prob_oof}
 
 

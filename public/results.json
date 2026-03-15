@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-03-15T06:06:23.286316",
+    "generated_at": "2026-03-15T06:08:40.473605",
     "train_samples": 10000,
     "test_samples": 0,
     "cv_folds": 5,
@@ -4464,20 +4464,20 @@
         }
       ],
       "metrics": {
-        "accuracy": 0.8958,
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1": 0.0,
+        "accuracy": 0.6297,
+        "precision": 0.1753,
+        "recall": 0.6891,
+        "f1": 0.2794,
         "roc_auc": 0.7069,
         "log_loss": 0.31,
         "confusion_matrix": [
           [
-            8958,
-            0
+            5579,
+            3379
           ],
           [
-            1042,
-            0
+            324,
+            718
           ]
         ],
         "roc_curve": {
@@ -7565,10 +7565,10 @@
     },
     {
       "model": "Random Forest",
-      "accuracy": 0.8958,
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1": 0.0,
+      "accuracy": 0.6297,
+      "precision": 0.1753,
+      "recall": 0.6891,
+      "f1": 0.2794,
       "roc_auc": 0.7069,
       "log_loss": 0.31
     },
