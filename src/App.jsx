@@ -90,11 +90,11 @@ function Divider() {
 
 function StatRow({ items }) {
   return (
-    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: "28px" }}>
+    <div style={{ display: "flex", gap: "12px", flexWrap: "nowrap", marginBottom: "28px" }}>
       {items.map((s) => (
         <div key={s.l} style={{
-          flex: "1 1 120px", background: "#f9fafb", border: "1px solid #e5e7eb",
-          borderRadius: "8px", padding: "16px", textAlign: "center",
+          flex: "1 1 0", minWidth: 0, background: "#f9fafb", border: "1px solid #e5e7eb",
+          borderRadius: "8px", padding: "14px 10px", textAlign: "center",
         }}>
           <div style={{ ...sans, fontSize: "25px", fontWeight: 700, color: "#111" }}>{s.n}</div>
           <div style={{ ...sans, fontSize: "9px", color: "#888", marginTop: "4px" }}>{s.l}</div>
