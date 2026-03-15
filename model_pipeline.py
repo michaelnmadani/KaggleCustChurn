@@ -266,7 +266,7 @@ def _cv_fold_proba(model, X, y, skf):
     """Manual k-fold loop for classifiers with predict_proba.
     SMOTE is applied to each training fold only; validation folds are untouched.
     Returns OOF probabilities and per-fold accuracy / F1 / AUC."""
-    smote = SMOTE(random_state=42)
+    smote = SMOTE(sampling_strategy=0.2, random_state=42)
     y_prob_oof = np.zeros(len(y))
     fold_scores = []
     for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
@@ -288,7 +288,7 @@ def _cv_fold_proba(model, X, y, skf):
 def _cv_fold_linreg(pipeline, X, y, skf):
     """Manual k-fold loop for a regression pipeline used as a classifier.
     SMOTE is applied to each training fold only; threshold via Youden's J per fold."""
-    smote = SMOTE(random_state=42)
+    smote = SMOTE(sampling_strategy=0.2, random_state=42)
     y_prob_oof = np.zeros(len(y))
     fold_scores = []
     for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
@@ -347,7 +347,7 @@ def train_xgboost(X, y, feature_names, skf):
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
     # ── Final model on 100% SMOTE-resampled data (feature importance + training log) ──
-    X_res, y_res = SMOTE(random_state=42).fit_resample(X, y)
+    X_res, y_res = SMOTE(sampling_strategy=0.2, random_state=42).fit_resample(X, y)
     model_final = xgb.XGBClassifier(**params)
     model_final.fit(X_res, y_res, eval_set=[(X_res, y_res)], verbose=False)
 
@@ -423,7 +423,7 @@ def train_random_forest(X, y, feature_names, skf):
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
     # Full fit for feature importance (SMOTE on full training set)
-    X_res, y_res = SMOTE(random_state=42).fit_resample(X, y)
+    X_res, y_res = SMOTE(sampling_strategy=0.2, random_state=42).fit_resample(X, y)
     model_final = RandomForestClassifier(**rf_params)
     model_final.fit(X_res, y_res)
     fi = model_final.feature_importances_
