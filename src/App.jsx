@@ -534,8 +534,8 @@ function ModelSection({ data }) {
         <strong>LightGBM</strong> (histogram-based gradient boosting with a 10-step feature engineering
         pipeline). All are evaluated via <strong>{data.meta.cv_folds}-fold stratified cross-validation</strong>{" "}
         on the {data.meta.train_samples.toLocaleString()}-sample training set. Two blended ensembles average
-        the out-of-fold probabilities from the four core models (XGBoost, Random Forest, Logistic Regression,
-        Linear Regression). LightGBM runs independently and is not included in the blended ensembles.
+        the out-of-fold probabilities from <strong>all five models</strong> — XGBoost, Random Forest,
+        Logistic Regression, Linear Regression, and LightGBM.
       </P>
 
       <SubHeading>XGBoost</SubHeading>
@@ -1154,6 +1154,7 @@ function ResultsSection({ data }) {
           rf:     "random_forest",
           lr:     "logistic_regression",
           linreg: "linear_regression",
+          lgbm:   "lightgbm",
           blend:  "blend_simple",
           wblend: "blend_auc_weighted",
         };
@@ -1277,73 +1278,20 @@ function ResultsSection({ data }) {
         <span style={{ color: "#4ec9b0" }}>recall_score</span>
         <span>,{"\n"}</span>
         <span>){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># OOF probabilities from all four base models</span>
-        <span>{"\n"}</span>
-        <span>xgb_prob    = </span>
-        <span style={{ color: "#dcdcaa" }}>cross_val_predict</span>
-        <span>(xgb_model,       X, y, cv=skf, method=</span>
-        <span style={{ color: "#ce9178" }}>"predict_proba"</span>
-        <span>)[:, </span>
-        <span style={{ color: "#b5cea8" }}>1</span>
-        <span>]{"\n"}</span>
-        <span>lr_prob     = </span>
-        <span style={{ color: "#dcdcaa" }}>cross_val_predict</span>
-        <span>(lr_pipeline,    X, y, cv=skf, method=</span>
-        <span style={{ color: "#ce9178" }}>"predict_proba"</span>
-        <span>)[:, </span>
-        <span style={{ color: "#b5cea8" }}>1</span>
-        <span>]{"\n"}</span>
-        <span>rf_prob     = </span>
-        <span style={{ color: "#dcdcaa" }}>cross_val_predict</span>
-        <span>(rf_model,       X, y, cv=skf, method=</span>
-        <span style={{ color: "#ce9178" }}>"predict_proba"</span>
-        <span>)[:, </span>
-        <span style={{ color: "#b5cea8" }}>1</span>
-        <span>]{"\n"}</span>
-        <span>linreg_prob = np.</span>
-        <span style={{ color: "#dcdcaa" }}>clip</span>
-        <span>(</span>
-        <span style={{ color: "#dcdcaa" }}>cross_val_predict</span>
-        <span>(linreg_pipeline, X, y, cv=skf), </span>
-        <span style={{ color: "#b5cea8" }}>0</span>
-        <span>, </span>
-        <span style={{ color: "#b5cea8" }}>1</span>
-        <span>){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Equal-weight soft-voting ensemble</span>
-        <span>{"\n"}</span>
-        <span>blend_prob = (xgb_prob + lr_prob + rf_prob + linreg_prob) / </span>
-        <span style={{ color: "#b5cea8" }}>4.0</span>
-        <span>{"\n"}</span>
-        <span>blend_pred = (blend_prob {">="} </span>
-        <span style={{ color: "#b5cea8" }}>0.5</span>
-        <span>).</span>
-        <span style={{ color: "#dcdcaa" }}>astype</span>
-        <span>(</span>
-        <span style={{ color: "#4ec9b0" }}>int</span>
-        <span>){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># AUC-weighted ensemble — weight proportional to each model's AUC</span>
-        <span>{"\n"}</span>
-        <span>aucs    = [</span>
-        <span style={{ color: "#dcdcaa" }}>roc_auc_score</span>
-        <span>(y, p) </span>
-        <span style={{ color: "#c586c0" }}>for</span>
-        <span> p </span>
-        <span style={{ color: "#c586c0" }}>in</span>
-        <span> [xgb_prob, lr_prob, rf_prob, linreg_prob]]{"\n"}</span>
-        <span>weights = np.</span>
-        <span style={{ color: "#dcdcaa" }}>array</span>
-        <span>(aucs) / </span>
-        <span style={{ color: "#dcdcaa" }}>sum</span>
-        <span>(aucs){"\n"}</span>
-        <span>wblend  = </span>
-        <span style={{ color: "#dcdcaa" }}>sum</span>
-        <span>(w * p </span>
-        <span style={{ color: "#c586c0" }}>for</span>
-        <span> w, p </span>
-        <span style={{ color: "#c586c0" }}>in</span>
-        <span> </span>
-        <span style={{ color: "#dcdcaa" }}>zip</span>
-        <span>(weights, [xgb_prob, lr_prob, rf_prob, linreg_prob]))</span>
+        <span style={{ color: "#6a9955" }}># OOF probabilities from all five models{"\n"}</span>
+        <span>xgb_prob    = </span><span style={{ color: "#dcdcaa" }}>cross_val_predict</span><span>(xgb_model,       X, y, cv=skf, method=</span><span style={{ color: "#ce9178" }}>"predict_proba"</span><span>)[:, </span><span style={{ color: "#b5cea8" }}>1</span><span>]{"\n"}</span>
+        <span>lr_prob     = </span><span style={{ color: "#dcdcaa" }}>cross_val_predict</span><span>(lr_pipeline,     X, y, cv=skf, method=</span><span style={{ color: "#ce9178" }}>"predict_proba"</span><span>)[:, </span><span style={{ color: "#b5cea8" }}>1</span><span>]{"\n"}</span>
+        <span>rf_prob     = </span><span style={{ color: "#dcdcaa" }}>cross_val_predict</span><span>(rf_model,        X, y, cv=skf, method=</span><span style={{ color: "#ce9178" }}>"predict_proba"</span><span>)[:, </span><span style={{ color: "#b5cea8" }}>1</span><span>]{"\n"}</span>
+        <span>linreg_prob = np.</span><span style={{ color: "#dcdcaa" }}>clip</span><span>(</span><span style={{ color: "#dcdcaa" }}>cross_val_predict</span><span>(linreg_pipeline, X, y, cv=skf), </span><span style={{ color: "#b5cea8" }}>0</span><span>, </span><span style={{ color: "#b5cea8" }}>1</span><span>){"\n"}</span>
+        <span>lgbm_prob   = </span><span style={{ color: "#dcdcaa" }}>cross_val_predict</span><span>(lgbm_model,      X, y, cv=skf, method=</span><span style={{ color: "#ce9178" }}>"predict_proba"</span><span>)[:, </span><span style={{ color: "#b5cea8" }}>1</span><span>]{"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Equal-weight soft-voting ensemble (all 5 models){"\n"}</span>
+        <span>all_probs  = [xgb_prob, lr_prob, rf_prob, linreg_prob, lgbm_prob]{"\n"}</span>
+        <span>blend_prob = </span><span style={{ color: "#dcdcaa" }}>sum</span><span>(all_probs) / </span><span style={{ color: "#b5cea8" }}>5.0</span><span>{"\n"}</span>
+        <span>blend_pred = (blend_prob &gt;= </span><span style={{ color: "#b5cea8" }}>0.5</span><span>).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(</span><span style={{ color: "#4ec9b0" }}>int</span><span>){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># AUC-weighted ensemble — weight proportional to each model's OOF AUC{"\n"}</span>
+        <span>aucs    = [</span><span style={{ color: "#dcdcaa" }}>roc_auc_score</span><span>(y, p) </span><span style={{ color: "#c586c0" }}>for</span><span> p </span><span style={{ color: "#c586c0" }}>in</span><span> all_probs]{"\n"}</span>
+        <span>weights = np.</span><span style={{ color: "#dcdcaa" }}>array</span><span>(aucs) / </span><span style={{ color: "#dcdcaa" }}>sum</span><span>(aucs){"\n"}</span>
+        <span>wblend  = </span><span style={{ color: "#dcdcaa" }}>sum</span><span>(w * p </span><span style={{ color: "#c586c0" }}>for</span><span> w, p </span><span style={{ color: "#c586c0" }}>in</span><span> </span><span style={{ color: "#dcdcaa" }}>zip</span><span>(weights, all_probs))</span>
       </CodeBlock>
     </section>
   );
@@ -1362,8 +1310,8 @@ function ConclusionSection({ data }) {
     lr:     data.models.logistic_regression,
     linreg: data.models.linear_regression,
     lgbm:   data.models.lightgbm,
-    blend:  data.blend.simple_blend,
-    wblend: data.blend.auc_weighted_blend,
+    blend:  { ...data.blend.simple_blend,       feature_importance: blendFI },
+    wblend: { ...data.blend.auc_weighted_blend, feature_importance: wblendFI },
   };
   const nameMap = {
     xgb:    "XGBoost",
@@ -1387,11 +1335,31 @@ function ConclusionSection({ data }) {
   const bM    = data.blend.simple_blend.metrics;
   const wbM   = data.blend.auc_weighted_blend.metrics;
 
-  const aw   = data.blend.auc_weighted_blend;
-  const wXgb = aw.weights.find((w) => w.model === "xgboost")?.weight ?? 0;
-  const wLr  = aw.weights.find((w) => w.model === "logistic_regression")?.weight ?? 0;
-  const wRf  = aw.weights.find((w) => w.model === "random_forest")?.weight ?? 0;
-  const wLin = aw.weights.find((w) => w.model === "linear_regression")?.weight ?? 0;
+  const aw    = data.blend.auc_weighted_blend;
+  const wXgb  = aw.weights.find((w) => w.model === "xgboost")?.weight ?? 0;
+  const wLr   = aw.weights.find((w) => w.model === "logistic_regression")?.weight ?? 0;
+  const wRf   = aw.weights.find((w) => w.model === "random_forest")?.weight ?? 0;
+  const wLin  = aw.weights.find((w) => w.model === "linear_regression")?.weight ?? 0;
+  const wLgbm = aw.weights.find((w) => w.model === "lightgbm")?.weight ?? 0;
+
+  // Blend feature importance: average XGB + RF + LGBM importances (the three tree models)
+  const _mergeImportances = (fiArrays, weights) => {
+    const map = {};
+    fiArrays.forEach((fi, idx) => {
+      const total = fi.reduce((s, f) => s + f.importance, 0) || 1;
+      fi.forEach(({ feature, importance }) => {
+        map[feature] = (map[feature] || 0) + (importance / total) * weights[idx];
+      });
+    });
+    return Object.entries(map)
+      .map(([feature, importance]) => ({ feature, importance }))
+      .sort((a, b) => b.importance - a.importance);
+  };
+  const xgbFI  = data.models.xgboost.feature_importance || [];
+  const rfFI   = data.models.random_forest.feature_importance || [];
+  const lgbmFI = data.models.lightgbm?.feature_importance || [];
+  const blendFI  = _mergeImportances([xgbFI, rfFI, lgbmFI], [1/3, 1/3, 1/3]);
+  const wblendFI = _mergeImportances([xgbFI, rfFI, lgbmFI], [wXgb, wRf, wLgbm]);
 
   return (
     <section>
@@ -1400,10 +1368,10 @@ function ConclusionSection({ data }) {
       <P>
         Five models are evaluated on a <strong>synthetic subset of {data.meta.train_samples.toLocaleString()} customers</strong>{" "}
         drawn from the Kaggle Playground S6E3 schema ({(data.dataset_stats.churn_rate * 100).toFixed(1)}% churn rate,{" "}
-        {data.meta.cv_folds}-fold stratified CV). The four core models — XGBoost, Random Forest,
-        Logistic Regression, and Linear Regression — are blended via soft-voting. LightGBM runs
-        a separate <strong>{data.models.lightgbm?.n_features ?? 216}-feature engineering pipeline</strong> and
-        is evaluated independently with an MCC-optimised decision threshold; it is not included in the blended ensembles.
+        {data.meta.cv_folds}-fold stratified CV) using a <strong>unified {data.meta.n_features}-feature pipeline</strong>.
+        All five models — XGBoost, Random Forest, Logistic Regression, Linear Regression, and LightGBM —
+        are blended via soft-voting using equal-weight and AUC-proportional weighted averages of their
+        out-of-fold predicted probabilities.
       </P>
 
       <Callout color="#fef9ec" border="#f59e0b">
@@ -1447,8 +1415,8 @@ function ConclusionSection({ data }) {
             Top features for <strong>{modelName}</strong>
             {activeModel === "xgb"    ? " (gain-based importance)" :
              activeModel === "rf"     ? " (Gini impurity importance)" :
-             activeModel === "blend"  ? " (equal average of XGB + RF importances)" :
-             activeModel === "wblend" ? " (AUC-weighted average of XGB + RF importances)" : ""}:
+             activeModel === "blend"  ? " (equal average of XGB + RF + LGBM importances)" :
+             activeModel === "wblend" ? " (AUC-weighted average of XGB + RF + LGBM importances)" : ""}:
           </P>
           <Figure>
             <div style={{ overflowX: "auto", border: "1px solid #e6e6e6", borderRadius: "6px" }}>
@@ -1503,18 +1471,16 @@ function ConclusionSection({ data }) {
             <tbody>
               {[
                 ["Dataset",       `Kaggle S6E3 Churn — synthetic ${data.meta.train_samples.toLocaleString()}-row subset (full competition ≈ 440,000 rows)`],
-                ["Core pipeline", `${data.cleaning_steps.length} cleaning steps → ${data.meta.n_features} features`],
-                ["LightGBM pipe", `10-step feature engineering → ${data.models.lightgbm?.n_features ?? 216} features · MCC threshold optimisation`],
+                ["Pipeline",      `${data.cleaning_steps.length}-step unified pipeline → ${data.meta.n_features} features shared by all models`],
                 ["Imbalance",     "scale_pos_weight (XGB) · class_weight='balanced' (RF, LR) · Youden's J (LinReg) · MCC grid (LGBM)"],
-                ["Core models",   "XGBoost · Random Forest · Logistic Regression · Linear Regression"],
-                ["Standalone",    "LightGBM (excluded from blends — independent evaluation)"],
-                ["Ensembles",     "Equal-weight soft-vote + AUC-proportional weighted soft-vote (4 core models only)"],
+                ["Models",        "XGBoost · Random Forest · Logistic Regression · Linear Regression · LightGBM"],
+                ["Ensembles",     "Equal-weight soft-vote + AUC-proportional weighted soft-vote (all 5 models)"],
                 ["Validation",    `${data.meta.cv_folds}-fold stratified cross-validation (OOF predictions)`],
                 ["XGBoost",       `Acc ${(xgbM.accuracy*100).toFixed(1)}%  F1 ${(xgbM.f1*100).toFixed(1)}%  AUC ${xgbM.roc_auc.toFixed(4)}`],
                 ["Random Forest", `Acc ${(rfM.accuracy*100).toFixed(1)}%  F1 ${(rfM.f1*100).toFixed(1)}%  AUC ${rfM.roc_auc.toFixed(4)}`],
                 ["Logistic Reg.", `Acc ${(lrM.accuracy*100).toFixed(1)}%  F1 ${(lrM.f1*100).toFixed(1)}%  AUC ${lrM.roc_auc.toFixed(4)}`],
                 ["Linear Reg.",   `Acc ${(linM.accuracy*100).toFixed(1)}%  F1 ${(linM.f1*100).toFixed(1)}%  AUC ${linM.roc_auc.toFixed(4)}  thresh ${data.models.linear_regression.params.threshold}`],
-                ...(lgbmM ? [["LightGBM", `Acc ${(lgbmM.accuracy*100).toFixed(1)}%  F1 ${(lgbmM.f1*100).toFixed(1)}%  AUC ${lgbmM.roc_auc.toFixed(4)}  (MCC-optimised threshold)`]] : []),
+                ...(lgbmM ? [["LightGBM",  `Acc ${(lgbmM.accuracy*100).toFixed(1)}%  F1 ${(lgbmM.f1*100).toFixed(1)}%  AUC ${lgbmM.roc_auc.toFixed(4)}  thresh ${data.models.lightgbm.params.optimal_threshold}`]] : []),
                 ["Equal Blend",   `Acc ${(bM.accuracy*100).toFixed(1)}%  F1 ${(bM.f1*100).toFixed(1)}%  AUC ${bM.roc_auc.toFixed(4)}`],
                 ["AUC-Wtd Blend", `Acc ${(wbM.accuracy*100).toFixed(1)}%  F1 ${(wbM.f1*100).toFixed(1)}%  AUC ${wbM.roc_auc.toFixed(4)}`],
               ].map(([label, detail], i) => (
@@ -1535,25 +1501,23 @@ function ConclusionSection({ data }) {
         </div>
         <div style={{ ...serif, fontSize: "15px", lineHeight: 1.7, color: "#e5e5e5" }}>
           These results reflect a <em>synthetic 10,000-row subset</em> of the Kaggle S6E3 competition data —
-          not the full dataset. AUC scores for the four core models cluster between{" "}
-          {Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc).toFixed(4)} and{" "}
-          {Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc).toFixed(4)}, which is consistent
-          with what one would expect from ~{data.meta.train_samples.toLocaleString()} training examples on an imbalanced
-          binary task ({(data.dataset_stats.churn_rate * 100).toFixed(1)}% positives). The LightGBM pipeline —
-          with {data.models.lightgbm?.n_features ?? 216} engineered features including all pairwise categorical
-          combinations, avg charge per tenure, and group aggregates — achieves AUC{" "}
-          {lgbmM?.roc_auc.toFixed(4) ?? "—"} here, but the same approach scored{" "}
-          <strong style={{ color: "#fff" }}>0.91367 AUC</strong> on the full Kaggle dataset. The gap is
-          expected: richer pairwise interaction features require more data to generalise well.
+          not the full dataset. All five models share the same unified {data.meta.n_features}-feature pipeline.
+          Individual model AUC scores range from{" "}
+          {Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 1).toFixed(4)} to{" "}
+          {Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 0).toFixed(4)},
+          which is expected at this scale on a {(data.dataset_stats.churn_rate * 100).toFixed(1)}%-positive
+          imbalanced task. The same feature engineering approach scored{" "}
+          <strong style={{ color: "#fff" }}>0.91367 AUC</strong> on the full Kaggle dataset — the gap is
+          expected: pairwise interaction features require more data to generalise well.
         </div>
         <div style={{ ...serif, fontSize: "15px", lineHeight: 1.7, color: "#e5e5e5", marginTop: "14px" }}>
-          Among the core models, soft-voting ensembles are the top performers: the equal-weight blend
-          reaches AUC {bM.roc_auc.toFixed(4)} (F1 {(bM.f1 * 100).toFixed(1)}%) and the AUC-weighted blend
-          reaches AUC {wbM.roc_auc.toFixed(4)} (F1 {(wbM.f1 * 100).toFixed(1)}%, weights XGB {wXgb.toFixed(3)} ·
-          LR {wLr.toFixed(3)} · RF {wRf.toFixed(3)} · LinReg {wLin.toFixed(3)}). Applying these pipelines to
-          the full competition dataset would be expected to meaningfully close the gap to the 0.91 AUC
-          benchmark — more training examples give every model better signal, especially for the
-          high-cardinality interaction features that LightGBM is designed to exploit.
+          The blended ensembles incorporate all five models. The equal-weight blend
+          reaches AUC {bM.roc_auc.toFixed(4)} (F1 {(bM.f1 * 100).toFixed(1)}%). The AUC-weighted blend
+          reaches AUC {wbM.roc_auc.toFixed(4)} (F1 {(wbM.f1 * 100).toFixed(1)}%) with weights
+          XGB {wXgb.toFixed(3)} · LR {wLr.toFixed(3)} · RF {wRf.toFixed(3)} · LinReg {wLin.toFixed(3)} · LGBM {wLgbm.toFixed(3)}.
+          Applying this unified pipeline to the full competition dataset is expected to meaningfully
+          close the gap to the 0.91 AUC benchmark — more training examples give every model better
+          signal, especially for the high-cardinality pairwise features.
         </div>
       </div>
     </section>
