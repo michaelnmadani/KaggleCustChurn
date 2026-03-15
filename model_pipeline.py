@@ -41,16 +41,9 @@ np.random.seed(42)
 CV_FOLDS = 5
 
 # ─────────────────────────────────────────────
-# LIGHTGBM CONFIG  (from Kaggle S6E3 notebook)
+# LIGHTGBM CONFIG
 # ─────────────────────────────────────────────
 
-LGBM_NUM_COLUMNS = ["SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges"]
-LGBM_CAT_COLUMNS = [
-    "gender", "Partner", "Dependents", "PhoneService", "MultipleLines",
-    "InternetService", "OnlineSecurity", "OnlineBackup", "DeviceProtection",
-    "TechSupport", "StreamingTV", "StreamingMovies", "Contract",
-    "PaperlessBilling", "PaymentMethod",
-]
 LGBM_PARAMS = {
     "objective": "binary", "metric": "auc", "n_estimators": 3000,
     "learning_rate": 0.02, "num_leaves": 20, "max_depth": 4,
@@ -172,19 +165,19 @@ CLEANING_STEPS = [
         "code": "df = df.drop(columns=['customerID'])"
     },
     {
+        "step": "Encode binary target",
+        "description": "Map Churn: 'Yes' → 1, 'No' → 0 (or keep as int if already numeric).",
+        "code": "df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0}).astype(int)"
+    },
+    {
         "step": "Convert TotalCharges to numeric",
         "description": "TotalCharges may contain whitespace strings for new customers (tenure=0). Coerce to float; these become NaN.",
         "code": "df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')"
     },
     {
-        "step": "Impute missing TotalCharges",
-        "description": "Fill NaN TotalCharges with 0 for new customers whose tenure is 0, otherwise use median imputation.",
-        "code": "df['TotalCharges'] = df['TotalCharges'].fillna(df['TotalCharges'].median())"
-    },
-    {
-        "step": "Encode binary target",
-        "description": "Map Churn: 'Yes' → 1, 'No' → 0 (or keep as int if already numeric).",
-        "code": "if df['Churn'].dtype == object: df['Churn'] = df['Churn'].map({'Yes': 1, 'No': 0})"
+        "step": "Impute missing values",
+        "description": "Fill all missing numeric columns with their column medians using SimpleImputer.",
+        "code": "df[num_cols] = SimpleImputer(strategy='median').fit_transform(df[num_cols])"
     },
     {
         "step": "Log-transform TotalCharges",
@@ -192,74 +185,184 @@ CLEANING_STEPS = [
         "code": "df['TotalCharges'] = np.log1p(df['TotalCharges'])"
     },
     {
-        "step": "One-hot encode categorical features",
-        "description": "Apply pd.get_dummies to all object-dtype columns with drop_first=True to avoid multicollinearity. Produces binary indicator columns for each category level.",
-        "code": "df = pd.get_dummies(df, columns=cat_cols, drop_first=True)"
-    },
-    {
-        "step": "Feature scaling (Logistic Regression / Linear Regression only)",
-        "description": "StandardScaler (zero mean, unit variance) is applied inside a Pipeline for Logistic Regression and Linear Regression. Tree-based models use raw integers.",
-        "code": "pipeline = Pipeline([('scaler', StandardScaler()), ('model', estimator)])"
-    },
-    {
         "step": "Tenure band flags",
-        "description": "Create three binary flags from the tenure column: TenureShort (< 10 months), TenureMid (11–20 months), TenureLong (≥ 21 months). Captures non-linear tenure effects.",
+        "description": "Create three binary flags: TenureShort (< 10 months), TenureMid (11–20 months), TenureLong (≥ 21 months). Captures non-linear tenure effects.",
         "code": "df['TenureShort'] = (df['tenure'] < 10).astype(int)\ndf['TenureMid'] = ((df['tenure'] >= 11) & (df['tenure'] <= 20)).astype(int)\ndf['TenureLong'] = (df['tenure'] >= 21).astype(int)"
     },
     {
         "step": "HasFamilyTies flag",
-        "description": "Combine Partner and Dependents into a single flag: HasFamilyTies = 1 when both Partner='Yes' AND Dependents='Yes'. Computed before label-encoding so the string values are still readable.",
+        "description": "Combine Partner and Dependents into a single binary flag: 1 when both Partner='Yes' AND Dependents='Yes'. Computed before OHE so string values are still readable.",
         "code": "df['HasFamilyTies'] = ((df['Partner'] == 'Yes') & (df['Dependents'] == 'Yes')).astype(int)"
     },
     {
         "step": "Log-transform tenure",
-        "description": "Apply log1p to the raw tenure (months) column to compress its right-skewed range. New customers (tenure=0) map to 0; long-tenure customers are pulled in, giving linear models a better signal.",
+        "description": "Apply log1p to tenure (months) to compress its right-skewed range. New customers (tenure=0) map to 0.",
         "code": "df['log_tenure'] = np.log1p(df['tenure'])"
+    },
+    {
+        "step": "Interaction features",
+        "description": "Explicit multiplications: tenure × MonthlyCharges (lifetime spend proxy) and SeniorCitizen × MonthlyCharges (demographic vulnerability × cost).",
+        "code": "df['tenure_x_monthly'] = df['tenure'] * df['MonthlyCharges']\ndf['senior_x_monthly'] = df['SeniorCitizen'] * df['MonthlyCharges']"
+    },
+    {
+        "step": "Polynomial features (degree 2)",
+        "description": "All degree-2 terms from {tenure, MonthlyCharges, TotalCharges}: 3 squares + 3 cross-products = 9 new features via PolynomialFeatures(degree=2, include_bias=False).",
+        "code": "po = PolynomialFeatures(degree=2, include_bias=False)\ndf[list(pn)] = po.fit_transform(df[['tenure','MonthlyCharges','TotalCharges']])"
+    },
+    {
+        "step": "Ratio & log-charge features",
+        "description": "avg_charge_per_tenure = TotalCharges / tenure (eps-safe for new customers). log_avg_charge = log1p of that ratio. Captures spending intensity over a customer's lifetime.",
+        "code": "df['avg_charge_per_tenure'] = df['TotalCharges'] / safe_tenure\ndf['log_avg_charge'] = np.log1p(df['avg_charge_per_tenure'].clip(lower=0))"
+    },
+    {
+        "step": "Frequency encoding",
+        "description": "For each of the 15 categorical columns, replace each value with its proportion in the dataset. Rare categories get small values; common ones get larger values.",
+        "code": "for col in cat_cols:\n    fm = df[col].value_counts(normalize=True).to_dict()\n    df[f'{col}_freq'] = df[col].map(fm).fillna(0)"
+    },
+    {
+        "step": "Target encoding",
+        "description": "For each categorical column, replace each value with the mean churn rate for that category. Computed globally — captures per-category churn signal directly.",
+        "code": "for col in cat_cols:\n    te = df.groupby(col)['Churn'].mean().to_dict()\n    df[f'{col}_target'] = df[col].map(te).fillna(global_mean)"
+    },
+    {
+        "step": "OrdinalEncoder",
+        "description": "Integer-encode all 15 categorical columns. Provides a compact numeric alternative to OHE for tree-based models that can exploit ordinal splits.",
+        "code": "oe = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)\ndf[[f'{c}_ordinal' for c in cat_cols]] = oe.fit_transform(df[cat_cols]).astype(int)"
+    },
+    {
+        "step": "KBinsDiscretizer",
+        "description": "Divide each of the 4 base numeric columns into 10 uniform-width ordinal bins. Lets tree models learn threshold effects at a fixed granularity.",
+        "code": "bn = KBinsDiscretizer(n_bins=10, strategy='uniform', encode='ordinal')\ndf[[f'{c}_bin' for c in num_base]] = bn.fit_transform(df[num_base]).astype(int)"
+    },
+    {
+        "step": "RobustScaler",
+        "description": "Scale each of the 4 base numeric columns by its IQR rather than std — robust to the outliers common in billing and tenure data. Used by all models.",
+        "code": "sc = RobustScaler()\ndf[[f'{c}_scaled' for c in num_base]] = sc.fit_transform(df[num_base])"
+    },
+    {
+        "step": "Group aggregates",
+        "description": "Mean, median, and std of each of the 4 base numeric columns grouped by Contract, InternetService, and PaymentMethod. 3 groups × 4 cols × 3 stats = 36 new features.",
+        "code": "for g in ('Contract','InternetService','PaymentMethod'):\n    for nc in num_base:\n        for m in ('mean','median','std'):\n            df[f'{nc}_by_{g}_{m}'] = df.groupby(g)[nc].transform(m).fillna(0)"
+    },
+    {
+        "step": "Pairwise categorical combinations",
+        "description": "String-concatenate every pair of the 15 categorical columns, then label-encode to integer. C(15,2) = 105 new features capturing joint categorical effects (e.g. Contract × InternetService).",
+        "code": "for c1, c2 in combinations(cat_cols, 2):\n    nm = f'{c1}_x_{c2}'\n    combined = df[c1].astype(str) + '_' + df[c2].astype(str)\n    enc = {v: i for i, v in enumerate(combined.unique())}\n    df[nm] = combined.map(enc).astype(int)"
+    },
+    {
+        "step": "One-hot encode categorical features",
+        "description": "Apply pd.get_dummies to all remaining string columns with drop_first=True to avoid multicollinearity. Produces binary indicator columns for LR and LinReg.",
+        "code": "df = pd.get_dummies(df, columns=cat_cols, drop_first=True)"
     },
 ]
 
 
 def clean_data(df: pd.DataFrame):
-    """Apply the cleaning pipeline and return X, y, feature_names."""
-    print("[→] Running cleaning pipeline …")
+    """Unified 19-step cleaning + feature engineering pipeline.
 
+    Used by ALL models (XGBoost, RF, LR, LinReg, LightGBM).
+    Steps 1–11 are leak-free (math ops only).
+    Steps 12–17 use full-dataset statistics (frequency, target encoding,
+    group aggregates) — slight global leakage accepted for a single unified
+    feature set across all models.
+    """
+    print("[→] Running unified cleaning + feature engineering pipeline …")
+
+    # 1. Drop customerID
     if "customerID" in df.columns:
         df = df.drop(columns=["customerID"])
 
+    # 2. Encode binary target
     if df["Churn"].dtype == object:
         df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
     df["Churn"] = df["Churn"].astype(int)
 
+    # 3. TotalCharges → numeric (whitespace strings → NaN)
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
 
-    num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    num_cols = [c for c in num_cols if c != "Churn"]
-    imputer = SimpleImputer(strategy="median")
-    df[num_cols] = imputer.fit_transform(df[num_cols])
+    # 4. Impute all missing numerics with column medians
+    num_cols = [c for c in df.select_dtypes(include=[np.number]).columns if c != "Churn"]
+    df[num_cols] = SimpleImputer(strategy="median").fit_transform(df[num_cols])
 
-    # ── Log-transform TotalCharges (after imputation so no NaN) ──
-    if "TotalCharges" in df.columns:
-        df["TotalCharges"] = np.log1p(df["TotalCharges"])
+    # 5. Log-transform TotalCharges (clip to 0 first — negative values from noise become 0)
+    df["TotalCharges"] = np.log1p(df["TotalCharges"].clip(lower=0))
 
-    # ── Feature flags (computed while Partner/Dependents are still "Yes"/"No" strings) ──
+    # 6. Tenure band flags (before OHE — strings still readable)
     df["TenureShort"] = (df["tenure"] < 10).astype(int)
     df["TenureMid"]   = ((df["tenure"] >= 11) & (df["tenure"] <= 20)).astype(int)
     df["TenureLong"]  = (df["tenure"] >= 21).astype(int)
 
+    # 7. HasFamilyTies flag (before OHE)
     if "Partner" in df.columns and "Dependents" in df.columns:
         df["HasFamilyTies"] = (
             (df["Partner"].astype(str).str.strip().str.lower() == "yes") &
             (df["Dependents"].astype(str).str.strip().str.lower() == "yes")
         ).astype(int)
 
-    # ── Log-transform tenure ──
+    # 8. Log-transform tenure
     df["log_tenure"] = np.log1p(df["tenure"])
 
-    # ── One-hot encode all remaining categorical columns ──
+    # 9. Interaction features
+    df["tenure_x_monthly"] = df["tenure"] * df["MonthlyCharges"]
+    df["senior_x_monthly"] = df["SeniorCitizen"] * df["MonthlyCharges"]
+
+    # 10. Polynomial features (degree 2) on [tenure, MonthlyCharges, TotalCharges]
+    pi = ["tenure", "MonthlyCharges", "TotalCharges"]
+    po = PolynomialFeatures(degree=2, include_bias=False)
+    pn = po.fit(df[pi]).get_feature_names_out(pi)
+    df[list(pn)] = po.fit_transform(df[pi])
+
+    # 11. Ratio & log-charge features (eps-safe for new customers with tenure=0)
+    eps = 1e-6
+    safe_tenure = df["tenure"].replace(0, np.nan).fillna(eps) + eps
+    df["avg_charge_per_tenure"] = df["TotalCharges"] / safe_tenure
+    df["log_avg_charge"]        = np.log1p(df["avg_charge_per_tenure"].clip(lower=0))
+
+    # ── Categorical feature engineering (computed before OHE) ──────────────
     cat_cols = df.select_dtypes(include="object").columns.tolist()
+
+    # 12. Frequency encoding (global)
+    for col in cat_cols:
+        fm = df[col].value_counts(normalize=True).to_dict()
+        df[f"{col}_freq"] = df[col].map(fm).fillna(0)
+
+    # 13. Target encoding (global)
+    gm = float(df["Churn"].mean())
+    for col in cat_cols:
+        te = df.groupby(col)["Churn"].mean().to_dict()
+        df[f"{col}_target"] = df[col].map(te).fillna(gm)
+
+    # 14. OrdinalEncoder
+    oe = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=-1)
+    df[[f"{c}_ordinal" for c in cat_cols]] = oe.fit_transform(df[cat_cols]).astype(int)
+
+    # 15. KBinsDiscretizer — 10 uniform bins per base numeric column
+    num_base = [c for c in ["SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges"] if c in df.columns]
+    bn = KBinsDiscretizer(n_bins=10, strategy="uniform", encode="ordinal", random_state=42)
+    df[[f"{c}_bin" for c in num_base]] = bn.fit_transform(df[num_base]).astype(int)
+
+    # 16. RobustScaler — scale by IQR, robust to outliers
+    sc = RobustScaler()
+    df[[f"{c}_scaled" for c in num_base]] = sc.fit_transform(df[num_base])
+
+    # 17. Group aggregates — 3 groups × 4 numerics × 3 stats = 36 features
+    for g in ("Contract", "InternetService", "PaymentMethod"):
+        if g not in df.columns:
+            continue
+        for nc in num_base:
+            for m in ("mean", "median", "std"):
+                df[f"{nc}_by_{g}_{m}"] = df.groupby(g)[nc].transform(m).fillna(0)
+
+    # 18. Pairwise categorical combinations — C(15,2) = 105 label-encoded integers
+    for c1, c2 in combinations(cat_cols, 2):
+        nm = f"{c1}_x_{c2}"
+        combined = df[c1].astype(str) + "_" + df[c2].astype(str)
+        enc = {v: i for i, v in enumerate(combined.unique())}
+        df[nm] = combined.map(enc).astype(int)
+
+    # 19. One-hot encode all remaining categorical columns
     if cat_cols:
         df = pd.get_dummies(df, columns=cat_cols, drop_first=True)
-    # Cast bool dummy columns to int and fill any residual NaN with 0
     bool_cols = df.select_dtypes(include="bool").columns.tolist()
     if bool_cols:
         df[bool_cols] = df[bool_cols].astype(int)
@@ -270,7 +373,7 @@ def clean_data(df: pd.DataFrame):
     feature_names = X.columns.tolist()
     X = X.values
 
-    print(f"[✓] Clean dataset — X: {X.shape}, churn rate: {y.mean():.2%}")
+    print(f"[✓] Unified dataset — X: {X.shape}, churn rate: {y.mean():.2%}")
     return X, y, feature_names
 
 
@@ -683,10 +786,10 @@ def compute_dataset_stats(raw_df: pd.DataFrame):
 
 
 # ─────────────────────────────────────────────
-# 5b. LIGHTGBM — 10-STEP FEATURE ENGINEERING
+# 5b. LIGHTGBM — UNIFIED FEATURE SET
 # ─────────────────────────────────────────────
 
-def _lgbm_prepare_raw(raw_df: pd.DataFrame):
+def _lgbm_prepare_raw(raw_df: pd.DataFrame):  # kept for reference only
     """Minimal preprocessing that preserves categorical columns as strings."""
     df = raw_df.copy()
     for col in ("customerID", "id"):
@@ -825,53 +928,35 @@ def _lgbm_engineer(X_tr: pd.DataFrame, y_tr: pd.Series,
     return Xf, Xfv, cat_names
 
 
-def train_lightgbm(raw_df: pd.DataFrame, skf):
+def train_lightgbm(X, y, feature_names, skf):
     """
-    LightGBM with 10-step feature engineering and OOF CV.
+    LightGBM on the unified feature set (same X, y as all other models).
     Threshold is chosen to maximise Matthews Correlation Coefficient.
     Feature importances come from a final full-data fit.
     """
-    print("\n[→] Training LightGBM (5-fold CV + 10-step feature engineering) …")
+    print("\n[→] Training LightGBM (5-fold CV + unified feature set) …")
 
-    X_raw, y = _lgbm_prepare_raw(raw_df)
     params = {k: v for k, v in LGBM_PARAMS.items() if k not in ("n_jobs", "verbose")}
     params.update({"n_jobs": -1, "verbose": -1})
-    early_stop = 300
 
     y_prob_oof = np.zeros(len(y))
     fold_scores = []
-    feat_names_final = None
 
-    for fold_i, (train_idx, val_idx) in enumerate(skf.split(X_raw, y), 1):
-        X_tr_raw = X_raw.iloc[train_idx]
-        y_tr     = y.iloc[train_idx]
-        X_val_raw = X_raw.iloc[val_idx]
-        y_val     = y.iloc[val_idx]
+    for fold_i, (train_idx, val_idx) in enumerate(skf.split(X, y), 1):
+        X_tr, y_tr   = X[train_idx], y[train_idx]
+        X_val, y_val = X[val_idx],   y[val_idx]
 
-        X_tr_eng, X_val_eng, cat_names = _lgbm_engineer(
-            X_tr_raw, y_tr, X_val_raw, LGBM_NUM_COLUMNS, LGBM_CAT_COLUMNS
-        )
-        if feat_names_final is None:
-            feat_names_final = X_tr_eng.columns.tolist()
-
-        lgb_cats = [
-            c for c in X_tr_eng.columns
-            if X_tr_eng[c].dtype.name == "category" or X_tr_eng[c].dtype == object
-        ]
         model = lgb.LGBMClassifier(**params)
-        fit_kw = {
-            "eval_set": [(X_val_eng, y_val)],
-            "callbacks": [
-                lgb.early_stopping(stopping_rounds=early_stop, verbose=False),
+        model.fit(
+            X_tr, y_tr,
+            eval_set=[(X_val, y_val)],
+            callbacks=[
+                lgb.early_stopping(stopping_rounds=300, verbose=False),
                 lgb.log_evaluation(period=-1),
             ],
-        }
-        if lgb_cats:
-            fit_kw["categorical_feature"] = lgb_cats
+        )
 
-        model.fit(X_tr_eng, y_tr, **fit_kw)
-
-        prob = model.predict_proba(X_val_eng)[:, 1]
+        prob = model.predict_proba(X_val)[:, 1]
         y_prob_oof[val_idx] = prob
 
         fa  = roc_auc_score(y_val, prob)
@@ -896,41 +981,26 @@ def train_lightgbm(raw_df: pd.DataFrame, skf):
     metrics = compute_metrics(y, y_pred_oof, y_prob_oof)
 
     # ── Full-data fit for feature importances ─────────────────────────────────
-    X_full, _, cat_names_full = _lgbm_engineer(
-        X_raw, y, X_raw.iloc[:5], LGBM_NUM_COLUMNS, LGBM_CAT_COLUMNS
-    )
-    lgb_cats_full = [
-        c for c in X_full.columns
-        if X_full[c].dtype.name == "category" or X_full[c].dtype == object
-    ]
     model_full = lgb.LGBMClassifier(**params)
-    fkw_full = {}
-    if lgb_cats_full:
-        fkw_full["categorical_feature"] = lgb_cats_full
-    model_full.fit(X_full, y, **fkw_full)
-
+    model_full.fit(X, y)
     fi = model_full.feature_importances_
-    fi_pairs = sorted(
-        zip(X_full.columns.tolist(), fi.tolist()), key=lambda x: x[1], reverse=True
-    )
+    fi_pairs = sorted(zip(feature_names, fi.tolist()), key=lambda x: x[1], reverse=True)
     feature_importance = [
         {"feature": f, "importance": round(float(v), 5)} for f, v in fi_pairs
     ]
 
-    display_params = {
-        k: v for k, v in LGBM_PARAMS.items() if k not in ("n_jobs", "verbose")
-    }
+    display_params = {k: v for k, v in LGBM_PARAMS.items() if k not in ("n_jobs", "verbose")}
     display_params["optimal_threshold"] = round(best_thresh, 4)
     display_params["best_mcc"]          = round(float(best_mcc), 4)
 
     print(
         f"[✓] LightGBM (OOF, thresh={best_thresh:.2f}) — "
         f"Accuracy: {metrics['accuracy']:.4f}, AUC: {metrics['roc_auc']:.4f}, "
-        f"F1: {metrics['f1']:.4f}  |  n_features={X_full.shape[1]}"
+        f"F1: {metrics['f1']:.4f}  |  n_features={X.shape[1]}"
     )
     return {
         "params":             display_params,
-        "n_features":         int(X_full.shape[1]),
+        "n_features":         int(X.shape[1]),
         "feature_importance": feature_importance,
         "fold_scores":        fold_scores,
         "metrics":            metrics,
@@ -962,7 +1032,7 @@ def main():
     lr_results     = train_logistic_regression(X, y, skf)
     rf_results     = train_random_forest(X, y, feature_names, skf)
     linreg_results = train_linear_regression_as_classifier(X, y, skf)
-    lgbm_results   = train_lightgbm(raw_df.copy(), skf)
+    lgbm_results   = train_lightgbm(X, y, feature_names, skf)
 
     # Blend using OOF probs (original 4 models only; LightGBM excluded)
     lgbm_oof = lgbm_results.pop("_oof_probs")
