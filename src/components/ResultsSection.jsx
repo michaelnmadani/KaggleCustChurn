@@ -79,8 +79,17 @@ const MetricTooltip = ({ active, payload, label }) => {
   )
 }
 
+const BAND_KEY_MAP = {
+  xgboost:             'xgboost',
+  random_forest:       'random_forest',
+  logistic_regression: 'logistic_regression',
+  linear_regression:   'linear_regression',
+  blend_simple:        'blend_simple',
+  blend_auc:           'blend_auc_weighted',
+}
+
 export default function ResultsSection({ data }) {
-  const { models = {}, blend = {}, model_comparison = [] } = data
+  const { models = {}, blend = {}, model_comparison = [], score_bands = {} } = data
   const [selectedModel, setSelectedModel] = useState('xgboost')
 
   // Resolve metrics for any key (including blend virtuals)
@@ -214,6 +223,113 @@ export default function ResultsSection({ data }) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Score bands table */}
+      {(() => {
+        const bands = score_bands[BAND_KEY_MAP[selectedModel]] ?? []
+        const maxChurn = Math.max(...bands.map(b => b.actual_churn_pct ?? 0), 1)
+        return (
+          <div className="card mb-6">
+            <p className="text-sm font-semibold text-white mb-1">Prediction Score Bands</p>
+            <p className="text-xs text-slate-400 mb-4">
+              OOF predicted probability buckets — customer count and observed churn rate per band.
+              Select a model above to update.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {ALL_KEYS.map(k => {
+                const isBlend = BLEND_KEYS.includes(k)
+                return (
+                  <button
+                    key={k}
+                    onClick={() => setSelectedModel(k)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      selectedModel === k ? 'text-white' : 'border-slate-600 text-slate-400 hover:text-slate-200'
+                    }`}
+                    style={selectedModel === k ? {
+                      background: ALL_COLORS[k] + '33',
+                      borderColor: ALL_COLORS[k] + '88',
+                      color: ALL_COLORS[k],
+                    } : {}}
+                  >
+                    {isBlend && <span className="mr-1 opacity-70">◈</span>}
+                    {ALL_LABELS[k]}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-700">
+                    {['Predicted Churn Band', 'Customers', '% of Total', 'Actual Churn %', 'Lift vs Base'].map(h => (
+                      <th key={h} className="px-3 py-2 text-left text-slate-400 font-semibold text-xs">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const totalCustomers = bands.reduce((s, b) => s + b.customers, 0)
+                    const baseRate = data.dataset_stats?.churn_rate ?? null
+                    return bands.map((row, i) => {
+                      const pctOfTotal = totalCustomers > 0
+                        ? ((row.customers / totalCustomers) * 100).toFixed(1)
+                        : '—'
+                      const lift = baseRate && row.actual_churn_pct != null
+                        ? (row.actual_churn_pct / 100 / baseRate).toFixed(2) + '×'
+                        : '—'
+                      const churnPct = row.actual_churn_pct
+                      const barWidth = churnPct != null
+                        ? Math.round((churnPct / maxChurn) * 100)
+                        : 0
+                      const color = ALL_COLORS[selectedModel]
+                      return (
+                        <tr
+                          key={i}
+                          className={`border-b border-slate-800 ${i % 2 === 0 ? 'bg-slate-800/20' : ''}`}
+                        >
+                          <td className="px-3 py-2.5 font-mono text-xs text-slate-200 font-semibold">
+                            {row.band}
+                          </td>
+                          <td className="px-3 py-2.5 font-mono text-xs text-slate-300 text-right">
+                            {row.customers.toLocaleString()}
+                          </td>
+                          <td className="px-3 py-2.5 font-mono text-xs text-slate-400 text-right">
+                            {pctOfTotal}%
+                          </td>
+                          <td className="px-3 py-2.5">
+                            {churnPct != null ? (
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1 bg-slate-700/50 rounded-full h-1.5 min-w-[60px]">
+                                  <div
+                                    className="h-1.5 rounded-full transition-all"
+                                    style={{ width: `${barWidth}%`, background: color }}
+                                  />
+                                </div>
+                                <span className="font-mono text-xs text-slate-200 w-12 text-right">
+                                  {churnPct.toFixed(1)}%
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-slate-500 text-xs">—</span>
+                            )}
+                          </td>
+                          <td className={`px-3 py-2.5 font-mono text-xs text-right ${
+                            lift !== '—' && parseFloat(lift) >= 2 ? 'text-emerald-400' :
+                            lift !== '—' && parseFloat(lift) >= 1 ? 'text-slate-300' :
+                            'text-slate-500'
+                          }`}>
+                            {lift}
+                          </td>
+                        </tr>
+                      )
+                    })
+                  })()}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Confusion matrices */}
       <div>
