@@ -813,24 +813,27 @@ function ModelSection({ data }) {
         exact-split GBDT and performs well on high-cardinality categorical features natively.
         Rather than using the standard cleaning pipeline, this model applies a dedicated{" "}
         <strong>10-step feature engineering pipeline</strong> derived from a high-scoring Kaggle
-        approach, producing <strong>{data.models.lightgbm?.n_features ?? 112} engineered features</strong>{" "}
-        from the original {data.dataset_stats.total_cols} raw columns. The decision threshold is
+        approach, producing <strong>{data.models.lightgbm?.n_features ?? 216} engineered features</strong>{" "}
+        from the original {data.dataset_stats.total_cols} raw columns — including all C(15,2) = 105
+        pairwise categorical combinations, an avg_charge_per_tenure ratio, and a log_avg_charge
+        column. The decision threshold is
         chosen by grid-searching for the value that maximises the{" "}
         <strong>Matthews Correlation Coefficient (MCC)</strong> on OOF predictions — a better single
         metric for imbalanced binary classification than accuracy or F1 alone.
       </P>
 
       <Callout color="#f9fafb" border="#d1d5db">
-        <strong>10-step pipeline:</strong>{" "}
+        <strong>10-step pipeline ({data.models.lightgbm?.n_features ?? 216} engineered features):</strong>{" "}
         (1) Frequency encoding →
         (2) OOF target encoding →
         (3) RobustScaler →
         (4) KBins discretiser (10 bins) →
         (5) OrdinalEncoder →
-        (6) Key pairwise categorical combinations (Contract×Internet, Contract×Payment, Internet×Payment) →
+        (6) <strong>All pairwise categorical combinations</strong> — C(15,2) = 105 pairs →
         (7) Interaction features (tenure×MonthlyCharges, SeniorCitizen×MonthlyCharges) →
         (8) Degree-2 polynomial features on numeric trio →
-        (9) Ratio feature (TotalCharges / tenure) →
+        (9) Ratio features: <code style={{ fontSize: "11px" }}>avg_charge_per_tenure</code> (TotalCharges ÷ tenure) +{" "}
+        <code style={{ fontSize: "11px" }}>log_avg_charge</code> (log-compressed spend) →
         (10) Group aggregates (mean / median / std of numerics by Contract, InternetService, PaymentMethod)
       </Callout>
 
@@ -1444,7 +1447,7 @@ function ConclusionSection({ data }) {
         AUC scores across all base models range from{" "}
         <strong>{Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? Infinity).toFixed(4)}</strong> to{" "}
         <strong>{Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 0).toFixed(4)}</strong>.
-        LightGBM uses <strong>{data.models.lightgbm?.n_features ?? 112} engineered features</strong> vs.{" "}
+        LightGBM uses <strong>{data.models.lightgbm?.n_features ?? 216} engineered features</strong> vs.{" "}
         {data.meta.n_features} for the other models, and optimises its decision threshold for MCC
         rather than using a fixed 0.5 cutoff. The blended ensembles combine OOF probabilities from
         all five base models.

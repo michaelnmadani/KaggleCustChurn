@@ -768,13 +768,8 @@ def _lgbm_engineer(X_tr: pd.DataFrame, y_tr: pd.Series,
     Xfv[oc] = oe.transform(Xvc[cat_cols]).astype(int)
     cat_names.extend(oc)
 
-    # ── 6. Key pairwise categorical combinations ──────────────────────────────
-    key_combos = [
-        ("Contract", "InternetService"),
-        ("Contract", "PaymentMethod"),
-        ("InternetService", "PaymentMethod"),
-    ]
-    for c1, c2 in key_combos:
+    # ── 6. All pairwise categorical combinations (C(15,2) = 105 pairs) ──────────
+    for c1, c2 in combinations(cat_cols, 2):
         if c1 in Xc.columns and c2 in Xc.columns:
             nm = f"{c1}_x_{c2}"
             Xf[nm]  = (Xc[c1].astype(str) + "_" + Xc[c2].astype(str)).astype("category")
@@ -794,10 +789,21 @@ def _lgbm_engineer(X_tr: pd.DataFrame, y_tr: pd.Series,
     Xf[list(pn)]  = po.transform(Xc[pi])
     Xfv[list(pn)] = po.transform(Xvc[pi])
 
-    # ── 9. Ratio feature ─────────────────────────────────────────────────────
+    # ── 9. Ratio & log-charge features ───────────────────────────────────────
     eps = 1e-6
-    Xf["total_per_tenure"]  = Xc["TotalCharges"] / (Xc["tenure"].replace(0, np.nan).fillna(eps) + eps)
-    Xfv["total_per_tenure"] = Xvc["TotalCharges"] / (Xvc["tenure"].replace(0, np.nan).fillna(eps) + eps)
+    safe_tenure_tr  = Xc["tenure"].replace(0, np.nan).fillna(eps) + eps
+    safe_tenure_val = Xvc["tenure"].replace(0, np.nan).fillna(eps) + eps
+
+    Xf["total_per_tenure"]  = Xc["TotalCharges"]  / safe_tenure_tr
+    Xfv["total_per_tenure"] = Xvc["TotalCharges"] / safe_tenure_val
+
+    # avg_charge_per_tenure: explicit average monthly spend over lifetime
+    Xf["avg_charge_per_tenure"]  = Xf["total_per_tenure"]
+    Xfv["avg_charge_per_tenure"] = Xfv["total_per_tenure"]
+
+    # log_avg_charge: log-compressed version reduces right-skew
+    Xf["log_avg_charge"]  = np.log1p(Xf["avg_charge_per_tenure"].clip(lower=0))
+    Xfv["log_avg_charge"] = np.log1p(Xfv["avg_charge_per_tenure"].clip(lower=0))
 
     # ── 10. Group aggregates ──────────────────────────────────────────────────
     for g in ("Contract", "InternetService", "PaymentMethod"):
