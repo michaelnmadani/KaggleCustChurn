@@ -578,7 +578,8 @@ function ModelSection({ data }) {
         <strong>LightGBM</strong> (histogram-based gradient boosting with a 10-step feature engineering
         pipeline). All are evaluated via <strong>{data.meta.cv_folds}-fold stratified cross-validation</strong>{" "}
         on the {data.meta.train_samples.toLocaleString()}-sample training set. Two blended ensembles average
-        the out-of-fold probabilities from all five base models.
+        the out-of-fold probabilities from the four core models (XGBoost, Random Forest, Logistic Regression,
+        Linear Regression). LightGBM runs independently and is not included in the blended ensembles.
       </P>
 
       <SubHeading>XGBoost</SubHeading>
@@ -1449,8 +1450,9 @@ function ConclusionSection({ data }) {
         <strong>{Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 0).toFixed(4)}</strong>.
         LightGBM uses <strong>{data.models.lightgbm?.n_features ?? 216} engineered features</strong> vs.{" "}
         {data.meta.n_features} for the other models, and optimises its decision threshold for MCC
-        rather than using a fixed 0.5 cutoff. The blended ensembles combine OOF probabilities from
-        all five base models.
+        rather than using a fixed 0.5 cutoff. LightGBM is evaluated independently — its OOF
+        probabilities are not included in the blended ensembles, which combine only the four
+        core models.
       </P>
 
       <Callout color="#faf5ff" border="#8b5cf6">
