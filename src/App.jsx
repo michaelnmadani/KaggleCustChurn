@@ -1304,6 +1304,32 @@ function ResultsSection({ data }) {
 function ConclusionSection({ data }) {
   const [activeModel, setActiveModel] = useState("xgb");
 
+  const aw    = data.blend.auc_weighted_blend;
+  const wXgb  = aw.weights.find((w) => w.model === "xgboost")?.weight ?? 0;
+  const wLr   = aw.weights.find((w) => w.model === "logistic_regression")?.weight ?? 0;
+  const wRf   = aw.weights.find((w) => w.model === "random_forest")?.weight ?? 0;
+  const wLin  = aw.weights.find((w) => w.model === "linear_regression")?.weight ?? 0;
+  const wLgbm = aw.weights.find((w) => w.model === "lightgbm")?.weight ?? 0;
+
+  // Blend feature importance: average XGB + RF + LGBM importances (the three tree models)
+  const _mergeImportances = (fiArrays, weights) => {
+    const map = {};
+    fiArrays.forEach((fi, idx) => {
+      const total = fi.reduce((s, f) => s + f.importance, 0) || 1;
+      fi.forEach(({ feature, importance }) => {
+        map[feature] = (map[feature] || 0) + (importance / total) * weights[idx];
+      });
+    });
+    return Object.entries(map)
+      .map(([feature, importance]) => ({ feature, importance }))
+      .sort((a, b) => b.importance - a.importance);
+  };
+  const xgbFI  = data.models.xgboost.feature_importance || [];
+  const rfFI   = data.models.random_forest.feature_importance || [];
+  const lgbmFI = data.models.lightgbm?.feature_importance || [];
+  const blendFI  = _mergeImportances([xgbFI, rfFI, lgbmFI], [1/3, 1/3, 1/3]);
+  const wblendFI = _mergeImportances([xgbFI, rfFI, lgbmFI], [wXgb, wRf, wLgbm]);
+
   const modelMap = {
     xgb:    data.models.xgboost,
     rf:     data.models.random_forest,
@@ -1334,32 +1360,6 @@ function ConclusionSection({ data }) {
   const lgbmM = data.models.lightgbm?.metrics;
   const bM    = data.blend.simple_blend.metrics;
   const wbM   = data.blend.auc_weighted_blend.metrics;
-
-  const aw    = data.blend.auc_weighted_blend;
-  const wXgb  = aw.weights.find((w) => w.model === "xgboost")?.weight ?? 0;
-  const wLr   = aw.weights.find((w) => w.model === "logistic_regression")?.weight ?? 0;
-  const wRf   = aw.weights.find((w) => w.model === "random_forest")?.weight ?? 0;
-  const wLin  = aw.weights.find((w) => w.model === "linear_regression")?.weight ?? 0;
-  const wLgbm = aw.weights.find((w) => w.model === "lightgbm")?.weight ?? 0;
-
-  // Blend feature importance: average XGB + RF + LGBM importances (the three tree models)
-  const _mergeImportances = (fiArrays, weights) => {
-    const map = {};
-    fiArrays.forEach((fi, idx) => {
-      const total = fi.reduce((s, f) => s + f.importance, 0) || 1;
-      fi.forEach(({ feature, importance }) => {
-        map[feature] = (map[feature] || 0) + (importance / total) * weights[idx];
-      });
-    });
-    return Object.entries(map)
-      .map(([feature, importance]) => ({ feature, importance }))
-      .sort((a, b) => b.importance - a.importance);
-  };
-  const xgbFI  = data.models.xgboost.feature_importance || [];
-  const rfFI   = data.models.random_forest.feature_importance || [];
-  const lgbmFI = data.models.lightgbm?.feature_importance || [];
-  const blendFI  = _mergeImportances([xgbFI, rfFI, lgbmFI], [1/3, 1/3, 1/3]);
-  const wblendFI = _mergeImportances([xgbFI, rfFI, lgbmFI], [wXgb, wRf, wLgbm]);
 
   return (
     <section>
