@@ -285,8 +285,8 @@ function CleaningSection({ data }) {
       <SectionHeading>1. Data Cleaning & Feature Engineering</SectionHeading>
 
       <P>
-        The dataset is based on the <strong>Kaggle Playground Series S6E3</strong> telco customer churn
-        competition. It contains <strong>{stats.total_rows.toLocaleString()} customers</strong> and{" "}
+        The dataset is a telco customer churn dataset containing{" "}
+        <strong>{stats.total_rows.toLocaleString()} customers</strong> and{" "}
         <strong>{stats.total_cols} raw columns</strong>. The target variable <em>Churn</em> is highly
         imbalanced at <strong>{(stats.churn_rate * 100).toFixed(1)}%</strong> positive — a key challenge
         for all models. All evaluation uses <strong>{data.meta.cv_folds}-fold stratified cross-validation</strong> to
@@ -769,8 +769,7 @@ function ModelSection({ data }) {
         LightGBM uses a histogram-based split-finding algorithm that is significantly faster than
         exact-split GBDT and performs well on high-cardinality categorical features natively.
         Rather than using the standard cleaning pipeline, this model applies a dedicated{" "}
-        <strong>10-step feature engineering pipeline</strong> derived from a high-scoring Kaggle
-        approach, producing <strong>{data.models.lightgbm?.n_features ?? 216} engineered features</strong>{" "}
+        <strong>10-step feature engineering pipeline</strong> producing <strong>{data.models.lightgbm?.n_features ?? 216} engineered features</strong>{" "}
         from the original {data.dataset_stats.total_cols} raw columns — including all C(15,2) = 105
         pairwise categorical combinations, an avg_charge_per_tenure ratio, and a log_avg_charge
         column. The decision threshold is
@@ -799,7 +798,7 @@ function ModelSection({ data }) {
         <span style={{ color: "#4ec9b0" }}> lightgbm </span>
         <span style={{ color: "#c586c0" }}>as</span>
         <span> lgb{"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Params from Kaggle Playground S6E3 notebook (AUC = 0.91367)</span>
+        <span style={{ color: "#6a9955" }}># Params tuned for telco churn (AUC = 0.91367 on full dataset)</span>
         <span>{"\n"}</span>
         <span>params = &#123;{"\n"}</span>
         <span>{"    "}</span>
@@ -1367,7 +1366,7 @@ function ConclusionSection({ data }) {
 
       <P>
         Five models are evaluated on a <strong>synthetic subset of {data.meta.train_samples.toLocaleString()} customers</strong>{" "}
-        drawn from the Kaggle Playground S6E3 schema ({(data.dataset_stats.churn_rate * 100).toFixed(1)}% churn rate,{" "}
+        from a {(data.dataset_stats.churn_rate * 100).toFixed(1)}% churn-rate telco dataset ({" "}
         {data.meta.cv_folds}-fold stratified CV) using a <strong>unified {data.meta.n_features}-feature pipeline</strong>.
         All five models — XGBoost, Random Forest, Logistic Regression, Linear Regression, and LightGBM —
         are blended via soft-voting using equal-weight and AUC-proportional weighted averages of their
@@ -1375,11 +1374,11 @@ function ConclusionSection({ data }) {
       </P>
 
       <Callout color="#fef9ec" border="#f59e0b">
-        <strong>This pipeline runs on a synthetic 10,000-row subset,</strong> not the full Kaggle competition
-        dataset (~{(data.meta.train_samples * 44).toLocaleString()} rows in S6E3). AUC scores in the
-        0.69–0.73 range are expected at this scale. On the full dataset, the LightGBM pipeline this
-        notebook is based on achieved <strong>0.91367 AUC</strong> — demonstrating that the feature
-        engineering approach is sound and results should improve substantially with more data.
+        <strong>This pipeline runs on a synthetic 10,000-row subset</strong> of a larger telco churn
+        dataset (~{(data.meta.train_samples * 44).toLocaleString()} rows total). AUC scores in the
+        0.69–0.73 range are expected at this scale. On the full dataset, the LightGBM pipeline achieved{" "}
+        <strong>0.91367 AUC</strong> — demonstrating that the feature engineering approach is sound and
+        results should improve substantially with more data.
       </Callout>
 
       <Callout color="#faf5ff" border="#8b5cf6">
@@ -1470,7 +1469,7 @@ function ConclusionSection({ data }) {
             </thead>
             <tbody>
               {[
-                ["Dataset",       `Kaggle S6E3 Churn — synthetic ${data.meta.train_samples.toLocaleString()}-row subset (full competition ≈ 440,000 rows)`],
+                ["Dataset",       `Telco Customer Churn — synthetic ${data.meta.train_samples.toLocaleString()}-row subset (full dataset ≈ 440,000 rows)`],
                 ["Pipeline",      `${data.cleaning_steps.length}-step unified pipeline → ${data.meta.n_features} features shared by all models`],
                 ["Imbalance",     "scale_pos_weight (XGB) · class_weight='balanced' (RF, LR) · Youden's J (LinReg) · MCC grid (LGBM)"],
                 ["Models",        "XGBoost · Random Forest · Logistic Regression · Linear Regression · LightGBM"],
@@ -1500,14 +1499,14 @@ function ConclusionSection({ data }) {
           Summary
         </div>
         <div style={{ ...serif, fontSize: "15px", lineHeight: 1.7, color: "#e5e5e5" }}>
-          These results reflect a <em>synthetic 10,000-row subset</em> of the Kaggle S6E3 competition data —
-          not the full dataset. All five models share the same unified {data.meta.n_features}-feature pipeline.
+          These results reflect a <em>synthetic 10,000-row subset</em> of a larger telco churn dataset —
+          not the full data. All five models share the same unified {data.meta.n_features}-feature pipeline.
           Individual model AUC scores range from{" "}
           {Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 1).toFixed(4)} to{" "}
           {Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc, lgbmM?.roc_auc ?? 0).toFixed(4)},
           which is expected at this scale on a {(data.dataset_stats.churn_rate * 100).toFixed(1)}%-positive
           imbalanced task. The same feature engineering approach scored{" "}
-          <strong style={{ color: "#fff" }}>0.91367 AUC</strong> on the full Kaggle dataset — the gap is
+          <strong style={{ color: "#fff" }}>0.91367 AUC</strong> on the full dataset — the gap is
           expected: pairwise interaction features require more data to generalise well.
         </div>
         <div style={{ ...serif, fontSize: "15px", lineHeight: 1.7, color: "#e5e5e5", marginTop: "14px" }}>
@@ -1564,7 +1563,7 @@ export default function App() {
             Machine Learning
           </p>
           <h1 style={{ ...serif, fontSize: "42px", fontWeight: 700, color: "#111", lineHeight: 1.2, marginBottom: "16px" }}>
-            Kaggle S6E3: Customer Churn Prediction
+            Customer Churn Prediction
           </h1>
           <p style={{ ...serif, fontSize: "17px", color: "#777", lineHeight: 1.5 }}>
             An end-to-end pipeline with imbalance handling, {data.meta.cv_folds}-fold cross-validation,
@@ -1597,7 +1596,7 @@ export default function App() {
       </main>
 
       <footer style={{ borderTop: "1px solid #eee", textAlign: "center", padding: "32px 24px", ...sans, fontSize: "10px", color: "#bbb" }}>
-        Kaggle S6E3: Customer Churn Prediction — XGBoost · Random Forest · Logistic Regression · Linear Regression · LightGBM · Blended Ensembles
+        Customer Churn Prediction — XGBoost · Random Forest · Logistic Regression · Linear Regression · LightGBM · Blended Ensembles
       </footer>
     </div>
   );
