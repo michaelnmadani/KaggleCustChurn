@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-03-15T06:13:45.703689",
+    "generated_at": "2026-03-15T06:20:48.711891",
     "train_samples": 10000,
     "test_samples": 0,
     "cv_folds": 5,
@@ -3598,7 +3598,44 @@
             0.2965
           ]
         }
-      }
+      },
+      "score_bands": [
+        {
+          "band": "0-5%",
+          "customers": 1466,
+          "actual_churn_pct": 2.73
+        },
+        {
+          "band": "5-10%",
+          "customers": 926,
+          "actual_churn_pct": 4.32
+        },
+        {
+          "band": "10-15%",
+          "customers": 758,
+          "actual_churn_pct": 5.41
+        },
+        {
+          "band": "15-20%",
+          "customers": 639,
+          "actual_churn_pct": 8.76
+        },
+        {
+          "band": "20-25%",
+          "customers": 587,
+          "actual_churn_pct": 6.98
+        },
+        {
+          "band": "25-50%",
+          "customers": 2418,
+          "actual_churn_pct": 9.88
+        },
+        {
+          "band": "50%+",
+          "customers": 3206,
+          "actual_churn_pct": 18.25
+        }
+      ]
     },
     "logistic_regression": {
       "params": {
@@ -4375,7 +4412,44 @@
             0.5263
           ]
         }
-      }
+      },
+      "score_bands": [
+        {
+          "band": "0-5%",
+          "customers": 25,
+          "actual_churn_pct": 0.0
+        },
+        {
+          "band": "5-10%",
+          "customers": 285,
+          "actual_churn_pct": 1.4
+        },
+        {
+          "band": "10-15%",
+          "customers": 525,
+          "actual_churn_pct": 1.71
+        },
+        {
+          "band": "15-20%",
+          "customers": 662,
+          "actual_churn_pct": 2.72
+        },
+        {
+          "band": "20-25%",
+          "customers": 776,
+          "actual_churn_pct": 3.99
+        },
+        {
+          "band": "25-50%",
+          "customers": 4030,
+          "actual_churn_pct": 6.95
+        },
+        {
+          "band": "50%+",
+          "customers": 3697,
+          "actual_churn_pct": 18.93
+        }
+      ]
     },
     "random_forest": {
       "params": {
@@ -5282,7 +5356,44 @@
             0.0
           ]
         }
-      }
+      },
+      "score_bands": [
+        {
+          "band": "0-5%",
+          "customers": 1367,
+          "actual_churn_pct": 3.22
+        },
+        {
+          "band": "5-10%",
+          "customers": 3601,
+          "actual_churn_pct": 5.3
+        },
+        {
+          "band": "10-15%",
+          "customers": 2230,
+          "actual_churn_pct": 10.67
+        },
+        {
+          "band": "15-20%",
+          "customers": 1230,
+          "actual_churn_pct": 14.31
+        },
+        {
+          "band": "20-25%",
+          "customers": 765,
+          "actual_churn_pct": 20.92
+        },
+        {
+          "band": "25-50%",
+          "customers": 806,
+          "actual_churn_pct": 28.91
+        },
+        {
+          "band": "50%+",
+          "customers": 1,
+          "actual_churn_pct": 0.0
+        }
+      ]
     },
     "linear_regression": {
       "params": {
@@ -6041,7 +6152,44 @@
             0.5455
           ]
         }
-      }
+      },
+      "score_bands": [
+        {
+          "band": "0-5%",
+          "customers": 1811,
+          "actual_churn_pct": 2.32
+        },
+        {
+          "band": "5-10%",
+          "customers": 1367,
+          "actual_churn_pct": 4.39
+        },
+        {
+          "band": "10-15%",
+          "customers": 1625,
+          "actual_churn_pct": 6.28
+        },
+        {
+          "band": "15-20%",
+          "customers": 1559,
+          "actual_churn_pct": 8.98
+        },
+        {
+          "band": "20-25%",
+          "customers": 1338,
+          "actual_churn_pct": 13.38
+        },
+        {
+          "band": "25-50%",
+          "customers": 2289,
+          "actual_churn_pct": 22.41
+        },
+        {
+          "band": "50%+",
+          "customers": 11,
+          "actual_churn_pct": 54.55
+        }
+      ]
     }
   },
   "blend": {
@@ -6824,7 +6972,44 @@
             0.4
           ]
         }
-      }
+      },
+      "score_bands": [
+        {
+          "band": "0-5%",
+          "customers": 486,
+          "actual_churn_pct": 1.23
+        },
+        {
+          "band": "5-10%",
+          "customers": 1109,
+          "actual_churn_pct": 2.61
+        },
+        {
+          "band": "10-15%",
+          "customers": 1171,
+          "actual_churn_pct": 4.27
+        },
+        {
+          "band": "15-20%",
+          "customers": 1148,
+          "actual_churn_pct": 6.18
+        },
+        {
+          "band": "20-25%",
+          "customers": 1084,
+          "actual_churn_pct": 6.0
+        },
+        {
+          "band": "25-50%",
+          "customers": 4060,
+          "actual_churn_pct": 13.69
+        },
+        {
+          "band": "50%+",
+          "customers": 942,
+          "actual_churn_pct": 28.13
+        }
+      ]
     },
     "auc_weighted_blend": {
       "weights": [
@@ -7592,7 +7777,44 @@
             0.4
           ]
         }
-      }
+      },
+      "score_bands": [
+        {
+          "band": "0-5%",
+          "customers": 479,
+          "actual_churn_pct": 1.25
+        },
+        {
+          "band": "5-10%",
+          "customers": 1100,
+          "actual_churn_pct": 2.64
+        },
+        {
+          "band": "10-15%",
+          "customers": 1181,
+          "actual_churn_pct": 4.15
+        },
+        {
+          "band": "15-20%",
+          "customers": 1141,
+          "actual_churn_pct": 6.13
+        },
+        {
+          "band": "20-25%",
+          "customers": 1096,
+          "actual_churn_pct": 6.11
+        },
+        {
+          "band": "25-50%",
+          "customers": 4082,
+          "actual_churn_pct": 13.77
+        },
+        {
+          "band": "50%+",
+          "customers": 921,
+          "actual_churn_pct": 28.12
+        }
+      ]
     }
   },
   "model_comparison": [
@@ -7650,5 +7872,229 @@
       "roc_auc": 0.7249,
       "log_loss": 0.3957
     }
-  ]
+  ],
+  "score_bands": {
+    "xgboost": [
+      {
+        "band": "0-5%",
+        "customers": 1466,
+        "actual_churn_pct": 2.73
+      },
+      {
+        "band": "5-10%",
+        "customers": 926,
+        "actual_churn_pct": 4.32
+      },
+      {
+        "band": "10-15%",
+        "customers": 758,
+        "actual_churn_pct": 5.41
+      },
+      {
+        "band": "15-20%",
+        "customers": 639,
+        "actual_churn_pct": 8.76
+      },
+      {
+        "band": "20-25%",
+        "customers": 587,
+        "actual_churn_pct": 6.98
+      },
+      {
+        "band": "25-50%",
+        "customers": 2418,
+        "actual_churn_pct": 9.88
+      },
+      {
+        "band": "50%+",
+        "customers": 3206,
+        "actual_churn_pct": 18.25
+      }
+    ],
+    "logistic_regression": [
+      {
+        "band": "0-5%",
+        "customers": 25,
+        "actual_churn_pct": 0.0
+      },
+      {
+        "band": "5-10%",
+        "customers": 285,
+        "actual_churn_pct": 1.4
+      },
+      {
+        "band": "10-15%",
+        "customers": 525,
+        "actual_churn_pct": 1.71
+      },
+      {
+        "band": "15-20%",
+        "customers": 662,
+        "actual_churn_pct": 2.72
+      },
+      {
+        "band": "20-25%",
+        "customers": 776,
+        "actual_churn_pct": 3.99
+      },
+      {
+        "band": "25-50%",
+        "customers": 4030,
+        "actual_churn_pct": 6.95
+      },
+      {
+        "band": "50%+",
+        "customers": 3697,
+        "actual_churn_pct": 18.93
+      }
+    ],
+    "random_forest": [
+      {
+        "band": "0-5%",
+        "customers": 1367,
+        "actual_churn_pct": 3.22
+      },
+      {
+        "band": "5-10%",
+        "customers": 3601,
+        "actual_churn_pct": 5.3
+      },
+      {
+        "band": "10-15%",
+        "customers": 2230,
+        "actual_churn_pct": 10.67
+      },
+      {
+        "band": "15-20%",
+        "customers": 1230,
+        "actual_churn_pct": 14.31
+      },
+      {
+        "band": "20-25%",
+        "customers": 765,
+        "actual_churn_pct": 20.92
+      },
+      {
+        "band": "25-50%",
+        "customers": 806,
+        "actual_churn_pct": 28.91
+      },
+      {
+        "band": "50%+",
+        "customers": 1,
+        "actual_churn_pct": 0.0
+      }
+    ],
+    "linear_regression": [
+      {
+        "band": "0-5%",
+        "customers": 1811,
+        "actual_churn_pct": 2.32
+      },
+      {
+        "band": "5-10%",
+        "customers": 1367,
+        "actual_churn_pct": 4.39
+      },
+      {
+        "band": "10-15%",
+        "customers": 1625,
+        "actual_churn_pct": 6.28
+      },
+      {
+        "band": "15-20%",
+        "customers": 1559,
+        "actual_churn_pct": 8.98
+      },
+      {
+        "band": "20-25%",
+        "customers": 1338,
+        "actual_churn_pct": 13.38
+      },
+      {
+        "band": "25-50%",
+        "customers": 2289,
+        "actual_churn_pct": 22.41
+      },
+      {
+        "band": "50%+",
+        "customers": 11,
+        "actual_churn_pct": 54.55
+      }
+    ],
+    "blend_simple": [
+      {
+        "band": "0-5%",
+        "customers": 486,
+        "actual_churn_pct": 1.23
+      },
+      {
+        "band": "5-10%",
+        "customers": 1109,
+        "actual_churn_pct": 2.61
+      },
+      {
+        "band": "10-15%",
+        "customers": 1171,
+        "actual_churn_pct": 4.27
+      },
+      {
+        "band": "15-20%",
+        "customers": 1148,
+        "actual_churn_pct": 6.18
+      },
+      {
+        "band": "20-25%",
+        "customers": 1084,
+        "actual_churn_pct": 6.0
+      },
+      {
+        "band": "25-50%",
+        "customers": 4060,
+        "actual_churn_pct": 13.69
+      },
+      {
+        "band": "50%+",
+        "customers": 942,
+        "actual_churn_pct": 28.13
+      }
+    ],
+    "blend_auc_weighted": [
+      {
+        "band": "0-5%",
+        "customers": 479,
+        "actual_churn_pct": 1.25
+      },
+      {
+        "band": "5-10%",
+        "customers": 1100,
+        "actual_churn_pct": 2.64
+      },
+      {
+        "band": "10-15%",
+        "customers": 1181,
+        "actual_churn_pct": 4.15
+      },
+      {
+        "band": "15-20%",
+        "customers": 1141,
+        "actual_churn_pct": 6.13
+      },
+      {
+        "band": "20-25%",
+        "customers": 1096,
+        "actual_churn_pct": 6.11
+      },
+      {
+        "band": "25-50%",
+        "customers": 4082,
+        "actual_churn_pct": 13.77
+      },
+      {
+        "band": "50%+",
+        "customers": 921,
+        "actual_churn_pct": 28.12
+      }
+    ]
+  }
 }

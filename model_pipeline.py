@@ -273,6 +273,41 @@ def compute_metrics(y_true, y_pred, y_prob):
 
 
 # ─────────────────────────────────────────────
+# 3a. SCORE BAND ANALYSIS
+# ─────────────────────────────────────────────
+
+SCORE_BANDS = [
+    (0.00, 0.05, "0-5%"),
+    (0.05, 0.10, "5-10%"),
+    (0.10, 0.15, "10-15%"),
+    (0.15, 0.20, "15-20%"),
+    (0.20, 0.25, "20-25%"),
+    (0.25, 0.50, "25-50%"),
+    (0.50, 1.01, "50%+"),
+]
+
+
+def compute_score_bands(y_true, y_prob):
+    """
+    Bucket OOF predicted probabilities into fixed bands.
+    Returns a list with: band label, customer count, actual churn %.
+    """
+    y_true = np.asarray(y_true)
+    y_prob = np.asarray(y_prob)
+    rows = []
+    for lo, hi, label in SCORE_BANDS:
+        mask = (y_prob >= lo) & (y_prob < hi)
+        n = int(mask.sum())
+        actual_churn_pct = round(float(y_true[mask].mean() * 100), 2) if n > 0 else None
+        rows.append({
+            "band":             label,
+            "customers":        n,
+            "actual_churn_pct": actual_churn_pct,
+        })
+    return rows
+
+
+# ─────────────────────────────────────────────
 # 3b. PER-FOLD CV HELPERS
 # ─────────────────────────────────────────────
 
@@ -549,6 +584,8 @@ def blend_models(y, model_probs: dict):
             "weights": auc_weight_table,
             "metrics": metrics_auc,
         },
+        "_simple_oof_probs": y_prob_simple,
+        "_auc_oof_probs":    y_prob_auc,
     }
 
 
@@ -648,6 +685,32 @@ def main():
     }
     blend_results = blend_models(y, model_probs)
 
+    # ── Score band analysis (OOF probs for all 6 models) ──
+    blend_simple_probs = blend_results.pop("_simple_oof_probs")
+    blend_auc_probs    = blend_results.pop("_auc_oof_probs")
+    score_bands = {
+        "xgboost":             compute_score_bands(y, model_probs["xgboost"]),
+        "logistic_regression": compute_score_bands(y, model_probs["logistic_regression"]),
+        "random_forest":       compute_score_bands(y, model_probs["random_forest"]),
+        "linear_regression":   compute_score_bands(y, model_probs["linear_regression"]),
+        "blend_simple":        compute_score_bands(y, blend_simple_probs),
+        "blend_auc_weighted":  compute_score_bands(y, blend_auc_probs),
+    }
+    # Attach score bands to each model result and blend sub-results
+    xgb_results["score_bands"]               = score_bands["xgboost"]
+    lr_results["score_bands"]                = score_bands["logistic_regression"]
+    rf_results["score_bands"]                = score_bands["random_forest"]
+    linreg_results["score_bands"]            = score_bands["linear_regression"]
+    blend_results["simple_blend"]["score_bands"]       = score_bands["blend_simple"]
+    blend_results["auc_weighted_blend"]["score_bands"] = score_bands["blend_auc_weighted"]
+
+    print("\n── Score Band Summary (OOF predictions) ──")
+    for model_key, bands in score_bands.items():
+        print(f"\n  {model_key}")
+        for b in bands:
+            churn_str = f"{b['actual_churn_pct']:.1f}%" if b["actual_churn_pct"] is not None else "  n/a"
+            print(f"    {b['band']:8s}  n={b['customers']:5d}  actual_churn={churn_str}")
+
     # Comparison table (all models + both blends)
     model_comparison = [
         {"model": "XGBoost",              **xgb_results["metrics"]},
@@ -683,6 +746,7 @@ def main():
         },
         "blend":            blend_results,
         "model_comparison": model_comparison,
+        "score_bands":      score_bands,
     }
 
     # Sanitise: replace NaN/Inf with None (Python json writes bare NaN which is invalid JSON)
