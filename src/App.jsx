@@ -90,11 +90,11 @@ function Divider() {
 
 function StatRow({ items }) {
   return (
-    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: "28px" }}>
+    <div style={{ display: "flex", gap: "12px", flexWrap: "nowrap", marginBottom: "28px" }}>
       {items.map((s) => (
         <div key={s.l} style={{
-          flex: "1 1 120px", background: "#f9fafb", border: "1px solid #e5e7eb",
-          borderRadius: "8px", padding: "16px", textAlign: "center",
+          flex: "1 1 0", minWidth: 0, background: "#f9fafb", border: "1px solid #e5e7eb",
+          borderRadius: "8px", padding: "14px 10px", textAlign: "center",
         }}>
           <div style={{ ...sans, fontSize: "25px", fontWeight: 700, color: "#111" }}>{s.n}</div>
           <div style={{ ...sans, fontSize: "9px", color: "#888", marginTop: "4px" }}>{s.l}</div>
@@ -457,102 +457,181 @@ function CleaningSection({ data }) {
         { n: `${data.meta.cv_folds}-fold`, l: "CV Strategy" },
       ]} />
 
-      <SubHeading>Data Loading & Cleaning Code</SubHeading>
+      <SubHeading>Core Pipeline — clean_data() Code</SubHeading>
 
       <CodeBlock>
-        <span style={{ color: "#c586c0" }}>import</span>
-        <span> pandas </span>
-        <span style={{ color: "#c586c0" }}>as</span>
-        <span> pd{"\n"}</span>
-        <span style={{ color: "#c586c0" }}>import</span>
-        <span> numpy </span>
-        <span style={{ color: "#c586c0" }}>as</span>
-        <span> np{"\n"}</span>
-        <span style={{ color: "#c586c0" }}>from</span>
-        <span> sklearn.preprocessing </span>
-        <span style={{ color: "#c586c0" }}>import</span>
-        <span style={{ color: "#4ec9b0" }}> LabelEncoder</span>
-        <span>{"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Load data</span>
-        <span>{"\n"}</span>
-        <span>df = pd.</span>
-        <span style={{ color: "#dcdcaa" }}>read_csv</span>
-        <span>(</span>
-        <span style={{ color: "#ce9178" }}>"customer_churn.csv"</span>
-        <span>){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Step 1: Drop customerID (unique identifier, no signal)</span>
-        <span>{"\n"}</span>
-        <span>df = df.</span>
-        <span style={{ color: "#dcdcaa" }}>drop</span>
-        <span>(columns=[</span>
-        <span style={{ color: "#ce9178" }}>"customerID"</span>
-        <span>]){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Step 2: TotalCharges stored as string — coerce to float</span>
-        <span>{"\n"}</span>
-        <span>df[</span>
-        <span style={{ color: "#ce9178" }}>"TotalCharges"</span>
-        <span>] = pd.</span>
-        <span style={{ color: "#dcdcaa" }}>to_numeric</span>
-        <span>(df[</span>
-        <span style={{ color: "#ce9178" }}>"TotalCharges"</span>
-        <span>], errors=</span>
-        <span style={{ color: "#ce9178" }}>"coerce"</span>
-        <span>){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Step 3: Impute {stats.missing_values.TotalCharges ?? 0} missing TotalCharges with median</span>
-        <span>{"\n"}</span>
-        <span>df[</span>
-        <span style={{ color: "#ce9178" }}>"TotalCharges"</span>
-        <span>] = df[</span>
-        <span style={{ color: "#ce9178" }}>"TotalCharges"</span>
-        <span>].</span>
-        <span style={{ color: "#dcdcaa" }}>fillna</span>
-        <span>(df[</span>
-        <span style={{ color: "#ce9178" }}>"TotalCharges"</span>
-        <span>].</span>
-        <span style={{ color: "#dcdcaa" }}>median</span>
-        <span>()){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Step 4: Encode binary target  Yes → 1, No → 0</span>
-        <span>{"\n"}</span>
-        <span>df[</span>
-        <span style={{ color: "#ce9178" }}>"Churn"</span>
-        <span>] = (df[</span>
-        <span style={{ color: "#ce9178" }}>"Churn"</span>
-        <span>] == </span>
-        <span style={{ color: "#ce9178" }}>"Yes"</span>
-        <span>).</span>
-        <span style={{ color: "#dcdcaa" }}>astype</span>
-        <span>(</span>
-        <span style={{ color: "#4ec9b0" }}>int</span>
-        <span>){"\n\n"}</span>
-        <span style={{ color: "#6a9955" }}># Step 5: Label-encode all remaining object columns</span>
-        <span>{"\n"}</span>
-        <span>le = </span>
-        <span style={{ color: "#4ec9b0" }}>LabelEncoder</span>
-        <span>(){"\n"}</span>
-        <span style={{ color: "#c586c0" }}>for</span>
-        <span> col </span>
-        <span style={{ color: "#c586c0" }}>in</span>
-        <span> df.</span>
-        <span style={{ color: "#dcdcaa" }}>select_dtypes</span>
-        <span>(include=</span>
-        <span style={{ color: "#ce9178" }}>"object"</span>
-        <span>).columns:{"\n"}</span>
-        <span>{"    "}df[col] = le.</span>
-        <span style={{ color: "#dcdcaa" }}>fit_transform</span>
-        <span>(df[col].</span>
-        <span style={{ color: "#dcdcaa" }}>astype</span>
-        <span>(</span>
-        <span style={{ color: "#4ec9b0" }}>str</span>
-        <span>)){"\n\n"}</span>
-        <span>X = df.</span>
-        <span style={{ color: "#dcdcaa" }}>drop</span>
-        <span>(columns=[</span>
-        <span style={{ color: "#ce9178" }}>"Churn"</span>
-        <span>]){"\n"}</span>
-        <span>y = df[</span>
-        <span style={{ color: "#ce9178" }}>"Churn"</span>
-        <span>]</span>
+        <span style={{ color: "#c586c0" }}>import</span><span> pandas </span><span style={{ color: "#c586c0" }}>as</span><span> pd{"\n"}</span>
+        <span style={{ color: "#c586c0" }}>import</span><span> numpy </span><span style={{ color: "#c586c0" }}>as</span><span> np{"\n"}</span>
+        <span style={{ color: "#c586c0" }}>from</span><span> sklearn.impute </span><span style={{ color: "#c586c0" }}>import</span><span style={{ color: "#4ec9b0" }}> SimpleImputer</span><span>{"\n"}</span>
+        <span style={{ color: "#c586c0" }}>from</span><span> sklearn.pipeline </span><span style={{ color: "#c586c0" }}>import</span><span style={{ color: "#4ec9b0" }}> Pipeline</span><span>{"\n"}</span>
+        <span style={{ color: "#c586c0" }}>from</span><span> sklearn.preprocessing </span><span style={{ color: "#c586c0" }}>import</span><span style={{ color: "#4ec9b0" }}> StandardScaler</span><span>{"\n\n"}</span>
+        <span>df = pd.</span><span style={{ color: "#dcdcaa" }}>read_csv</span><span>(</span><span style={{ color: "#ce9178" }}>"customer_churn.csv"</span><span>){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 1: Drop customerID (unique identifier, no signal){"\n"}</span>
+        <span>df = df.</span><span style={{ color: "#dcdcaa" }}>drop</span><span>(columns=[</span><span style={{ color: "#ce9178" }}>"customerID"</span><span>]){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 2: Encode binary target — Yes → 1, No → 0{"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"Churn"</span><span>] = df[</span><span style={{ color: "#ce9178" }}>"Churn"</span><span>].</span><span style={{ color: "#dcdcaa" }}>map</span><span>({"{"}</span><span style={{ color: "#ce9178" }}>"Yes"</span><span>: </span><span style={{ color: "#b5cea8" }}>1</span><span>, </span><span style={{ color: "#ce9178" }}>"No"</span><span>: </span><span style={{ color: "#b5cea8" }}>0</span><span>{"}"}).astype(int){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 3: TotalCharges → numeric (whitespace strings → NaN){"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"TotalCharges"</span><span>] = pd.</span><span style={{ color: "#dcdcaa" }}>to_numeric</span><span>(df[</span><span style={{ color: "#ce9178" }}>"TotalCharges"</span><span>], errors=</span><span style={{ color: "#ce9178" }}>"coerce"</span><span>){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 4: Impute all missing numerics with column medians{"\n"}</span>
+        <span>num_cols = [c </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> df.</span><span style={{ color: "#dcdcaa" }}>select_dtypes</span><span>(</span><span style={{ color: "#ce9178" }}>"number"</span><span>).columns </span><span style={{ color: "#c586c0" }}>if</span><span> c != </span><span style={{ color: "#ce9178" }}>"Churn"</span><span>]{"\n"}</span>
+        <span>df[num_cols] = </span><span style={{ color: "#4ec9b0" }}>SimpleImputer</span><span>(strategy=</span><span style={{ color: "#ce9178" }}>"median"</span><span>).</span><span style={{ color: "#dcdcaa" }}>fit_transform</span><span>(df[num_cols]){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 5: Log-transform TotalCharges (log1p safe for zeros){"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"TotalCharges"</span><span>] = np.</span><span style={{ color: "#dcdcaa" }}>log1p</span><span>(df[</span><span style={{ color: "#ce9178" }}>"TotalCharges"</span><span>]){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Steps 6–8: Feature flags (before OHE — strings still readable){"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"TenureShort"</span><span>]   = (df[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>] &lt; </span><span style={{ color: "#b5cea8" }}>10</span><span>).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"TenureMid"</span><span>]     = ((df[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>] &gt;= </span><span style={{ color: "#b5cea8" }}>11</span><span>) &amp; (df[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>] &lt;= </span><span style={{ color: "#b5cea8" }}>20</span><span>)).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"TenureLong"</span><span>]    = (df[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>] &gt;= </span><span style={{ color: "#b5cea8" }}>21</span><span>).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"HasFamilyTies"</span><span>] = ({"\n"}</span>
+        <span>{"    "}(df[</span><span style={{ color: "#ce9178" }}>"Partner"</span><span>] == </span><span style={{ color: "#ce9178" }}>"Yes"</span><span>) &amp; (df[</span><span style={{ color: "#ce9178" }}>"Dependents"</span><span>] == </span><span style={{ color: "#ce9178" }}>"Yes"</span><span>){"\n"}</span>
+        <span>).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 9: Log-transform tenure{"\n"}</span>
+        <span>df[</span><span style={{ color: "#ce9178" }}>"log_tenure"</span><span>] = np.</span><span style={{ color: "#dcdcaa" }}>log1p</span><span>(df[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>]){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Step 10: One-hot encode all remaining categorical columns{"\n"}</span>
+        <span>cat_cols = df.</span><span style={{ color: "#dcdcaa" }}>select_dtypes</span><span>(</span><span style={{ color: "#ce9178" }}>"object"</span><span>).columns.</span><span style={{ color: "#dcdcaa" }}>tolist</span><span>(){"\n"}</span>
+        <span>df = pd.</span><span style={{ color: "#dcdcaa" }}>get_dummies</span><span>(df, columns=cat_cols, drop_first=</span><span style={{ color: "#569cd6" }}>True</span><span>){"\n"}</span>
+        <span>df[df.</span><span style={{ color: "#dcdcaa" }}>select_dtypes</span><span>(</span><span style={{ color: "#ce9178" }}>"bool"</span><span>).columns] = df.</span><span style={{ color: "#dcdcaa" }}>select_dtypes</span><span>(</span><span style={{ color: "#ce9178" }}>"bool"</span><span>).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># StandardScaler applied inside Pipeline for LR &amp; LinReg only{"\n"}</span>
+        <span>pipeline = </span><span style={{ color: "#4ec9b0" }}>Pipeline</span><span>([(</span><span style={{ color: "#ce9178" }}>"scaler"</span><span>, </span><span style={{ color: "#4ec9b0" }}>StandardScaler</span><span>()), (</span><span style={{ color: "#ce9178" }}>"model"</span><span>, estimator)]){"\n\n"}</span>
+        <span>X = df.</span><span style={{ color: "#dcdcaa" }}>drop</span><span>(columns=[</span><span style={{ color: "#ce9178" }}>"Churn"</span><span>]).values  </span><span style={{ color: "#6a9955" }}># → shape ({data.meta.train_samples.toLocaleString()}, {data.meta.n_features}){"\n"}</span>
+        <span>y = df[</span><span style={{ color: "#ce9178" }}>"Churn"</span><span>].values</span>
       </CodeBlock>
+
+      <SubHeading>LightGBM Feature Engineering Pipeline (10 Steps)</SubHeading>
+
+      <P>
+        LightGBM runs a separate 10-step feature engineering pipeline that is fitted inside the CV loop
+        (on the training fold only) and applied to the validation fold — no data leakage. Starting from
+        the same {data.meta.train_samples.toLocaleString()} rows and 19 raw columns, this pipeline
+        produces <strong>{data.models.lightgbm?.n_features ?? 216} engineered features</strong>. The
+        core pipeline above produces {data.meta.n_features} features; LightGBM's extra features come
+        primarily from the 105 pairwise categorical combinations (step 6) and the 36 group aggregates (step 10).
+      </P>
+
+      <Figure caption="10-step LightGBM feature engineering pipeline — fitted on each training fold, applied to its paired validation fold">
+        <div style={{ border: "1px solid #e6e6e6", borderRadius: "6px", overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", ...sans }}>
+            <colgroup>
+              <col style={{ width: "28px" }} />
+              <col style={{ width: "16%" }} />
+              <col style={{ width: "44%" }} />
+              <col style={{ width: "28%" }} />
+            </colgroup>
+            <thead>
+              <tr>
+                <th style={{ ...thStyle, textAlign: "center" }}>#</th>
+                <th style={thStyle}>Step</th>
+                <th style={thStyle}>Description</th>
+                <th style={thStyle}>Output columns</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["1",  "Frequency encoding",      "Replace each value with its proportion in the training fold. Rare categories → small value; common ones → large value. Applied to all 4 numeric + 15 categorical columns.",                       "{col}_freq  (19 cols)"],
+                ["2",  "OOF target encoding",     "Group-mean of y_train per category value, computed on this fold's training labels only. Unseen values fall back to the global mean. No future data leakage.",                                   "{col}_target  (19 cols)"],
+                ["3",  "RobustScaler",             "Scale each of the 4 numeric columns by its IQR rather than std. Robust to the outliers common in billing and tenure data.",                                                                     "{col}_scaled  (4 cols)"],
+                ["4",  "KBinsDiscretizer",         "Divide each of the 4 numeric columns into 10 uniform-width ordinal bins. Lets LightGBM learn threshold effects at a fixed granularity without continuous splits.",                             "{col}_bin  (4 cols)"],
+                ["5",  "OrdinalEncoder",           "Integer-encode all 15 categorical columns. Combined with the category dtype, LightGBM uses these columns for native categorical splits at training time.",                                      "{col}_ordinal  (15 cols)"],
+                ["6",  "Pairwise combos",          "String-concatenate every pair of the 15 categorical columns. C(15,2) = 105 new category features. Each captures the joint effect of two categorical signals — e.g. Contract × InternetService.", "{c1}_x_{c2}  (105 cols)"],
+                ["7",  "Interaction features",     "Explicit multiplication: tenure × MonthlyCharges (lifetime spend proxy) and SeniorCitizen × MonthlyCharges (demographic vulnerability × cost pressure).",                                      "tenure_x_monthly, senior_x_monthly  (2 cols)"],
+                ["8",  "Polynomial features",      "All degree-2 terms from {tenure, MonthlyCharges, TotalCharges}: three squares and three cross-products. sklearn PolynomialFeatures(degree=2, include_bias=False).",                             "tenure², MonthlyCharges², ...  (9 cols)"],
+                ["9",  "Ratio & log features",     "avg_charge_per_tenure = TotalCharges / tenure (eps-safe). log_avg_charge = log1p(avg_charge_per_tenure). Captures spending intensity over a customer's lifetime.",                              "avg_charge_per_tenure, log_avg_charge  (2 cols)"],
+                ["10", "Group aggregates",         "Mean, median, and std of each of the 4 numeric columns grouped by Contract, InternetService, and PaymentMethod. 3 groups × 4 numerics × 3 stats = 36 features. Computed from the training fold; mapped onto the validation fold via a dictionary lookup.", "{num}_by_{group}_{stat}  (36 cols)"],
+              ].map(([n, step, desc, output], i) => (
+                <tr key={n} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
+                  <td style={{ ...tdStyle, fontWeight: 700, color: "#999", textAlign: "center" }}>{n}</td>
+                  <td style={{ ...tdStyle, fontWeight: 600, color: "#222", wordBreak: "break-word" }}>{step}</td>
+                  <td style={{ ...tdStyle, color: "#555", fontSize: "10px", wordBreak: "break-word" }}>{desc}</td>
+                  <td style={{ ...tdStyle, wordBreak: "break-word" }}>
+                    <code style={{ ...mono, fontSize: "9px", background: "#f5f5f5", padding: "2px 6px", borderRadius: "3px", color: "#555", whiteSpace: "pre-wrap" }}>{output}</code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Figure>
+
+      <SubHeading>LightGBM Feature Engineering Code</SubHeading>
+
+      <CodeBlock>
+        <span style={{ color: "#c586c0" }}>from</span><span> itertools </span><span style={{ color: "#c586c0" }}>import</span><span> combinations{"\n"}</span>
+        <span style={{ color: "#c586c0" }}>from</span><span> sklearn.preprocessing </span><span style={{ color: "#c586c0" }}>import</span><span> ({"\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#4ec9b0" }}>RobustScaler</span><span>, </span><span style={{ color: "#4ec9b0" }}>OrdinalEncoder</span><span>, </span><span style={{ color: "#4ec9b0" }}>KBinsDiscretizer</span><span>, </span><span style={{ color: "#4ec9b0" }}>PolynomialFeatures</span><span>{"\n"}</span>
+        <span>){"\n\n"}</span>
+        <span style={{ color: "#c586c0" }}>def</span><span> </span><span style={{ color: "#dcdcaa" }}>_lgbm_engineer</span><span>(X_tr, y_tr, X_val, num_cols, cat_cols):{"\n"}</span>
+        <span>{"    "}Xc, Xvc = X_tr.</span><span style={{ color: "#dcdcaa" }}>copy</span><span>(), X_val.</span><span style={{ color: "#dcdcaa" }}>copy</span><span>(){"\n"}</span>
+        <span>{"    "}Xf  = pd.</span><span style={{ color: "#4ec9b0" }}>DataFrame</span><span>(index=X_tr.index){"\n"}</span>
+        <span>{"    "}Xfv = pd.</span><span style={{ color: "#4ec9b0" }}>DataFrame</span><span>(index=X_val.index){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 1. Frequency encoding{"\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#c586c0" }}>for</span><span> col </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols + cat_cols:{"\n"}</span>
+        <span>{"        "}fm = Xc[col].</span><span style={{ color: "#dcdcaa" }}>value_counts</span><span>(normalize=</span><span style={{ color: "#569cd6" }}>True</span><span>).</span><span style={{ color: "#dcdcaa" }}>to_dict</span><span>(){"\n"}</span>
+        <span>{"        "}Xf[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>col</span><span style={{ color: "#ce9178" }}>{"}"}_freq"</span><span>]  = Xc[col].</span><span style={{ color: "#dcdcaa" }}>map</span><span>(fm).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(</span><span style={{ color: "#b5cea8" }}>0</span><span>){"\n"}</span>
+        <span>{"        "}Xfv[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>col</span><span style={{ color: "#ce9178" }}>{"}"}_freq"</span><span>] = Xvc[col].</span><span style={{ color: "#dcdcaa" }}>map</span><span>(fm).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(</span><span style={{ color: "#b5cea8" }}>0</span><span>){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 2. OOF target encoding (fitted on y_tr — no leakage){"\n"}</span>
+        <span>{"    "}gm = </span><span style={{ color: "#dcdcaa" }}>float</span><span>(y_tr.</span><span style={{ color: "#dcdcaa" }}>mean</span><span>()){"\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#c586c0" }}>for</span><span> col </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols + cat_cols:{"\n"}</span>
+        <span>{"        "}te = y_tr.</span><span style={{ color: "#dcdcaa" }}>groupby</span><span>(Xc[col]).</span><span style={{ color: "#dcdcaa" }}>mean</span><span>().</span><span style={{ color: "#dcdcaa" }}>to_dict</span><span>(){"\n"}</span>
+        <span>{"        "}Xf[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>col</span><span style={{ color: "#ce9178" }}>{"}"}_target"</span><span>]  = Xc[col].</span><span style={{ color: "#dcdcaa" }}>map</span><span>(te).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(gm){"\n"}</span>
+        <span>{"        "}Xfv[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>col</span><span style={{ color: "#ce9178" }}>{"}"}_target"</span><span>] = Xvc[col].</span><span style={{ color: "#dcdcaa" }}>map</span><span>(te).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(gm){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 3. RobustScaler — scale by IQR, robust to billing outliers{"\n"}</span>
+        <span>{"    "}sc = </span><span style={{ color: "#4ec9b0" }}>RobustScaler</span><span>(){"\n"}</span>
+        <span>{"    "}Xf[[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c</span><span style={{ color: "#ce9178" }}>{"}"}_scaled"</span><span> </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols]]  = sc.</span><span style={{ color: "#dcdcaa" }}>fit_transform</span><span>(Xc[num_cols]){"\n"}</span>
+        <span>{"    "}Xfv[[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c</span><span style={{ color: "#ce9178" }}>{"}"}_scaled"</span><span> </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols]] = sc.</span><span style={{ color: "#dcdcaa" }}>transform</span><span>(Xvc[num_cols]){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 4. KBinsDiscretizer — 10 uniform bins per numeric column{"\n"}</span>
+        <span>{"    "}bn = </span><span style={{ color: "#4ec9b0" }}>KBinsDiscretizer</span><span>(n_bins=</span><span style={{ color: "#b5cea8" }}>10</span><span>, strategy=</span><span style={{ color: "#ce9178" }}>"uniform"</span><span>, encode=</span><span style={{ color: "#ce9178" }}>"ordinal"</span><span>){"\n"}</span>
+        <span>{"    "}Xf[[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c</span><span style={{ color: "#ce9178" }}>{"}"}_bin"</span><span> </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols]]  = bn.</span><span style={{ color: "#dcdcaa" }}>fit_transform</span><span>(Xc[num_cols]).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n"}</span>
+        <span>{"    "}Xfv[[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c</span><span style={{ color: "#ce9178" }}>{"}"}_bin"</span><span> </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols]] = bn.</span><span style={{ color: "#dcdcaa" }}>transform</span><span>(Xvc[num_cols]).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 5. OrdinalEncoder — integer-encode all 15 categorical columns{"\n"}</span>
+        <span>{"    "}oe = </span><span style={{ color: "#4ec9b0" }}>OrdinalEncoder</span><span>(handle_unknown=</span><span style={{ color: "#ce9178" }}>"use_encoded_value"</span><span>, unknown_value=-</span><span style={{ color: "#b5cea8" }}>1</span><span>){"\n"}</span>
+        <span>{"    "}Xf[[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c</span><span style={{ color: "#ce9178" }}>{"}"}_ordinal"</span><span> </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> cat_cols]]  = oe.</span><span style={{ color: "#dcdcaa" }}>fit_transform</span><span>(Xc[cat_cols]).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n"}</span>
+        <span>{"    "}Xfv[[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c</span><span style={{ color: "#ce9178" }}>{"}"}_ordinal"</span><span> </span><span style={{ color: "#c586c0" }}>for</span><span> c </span><span style={{ color: "#c586c0" }}>in</span><span> cat_cols]] = oe.</span><span style={{ color: "#dcdcaa" }}>transform</span><span>(Xvc[cat_cols]).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(int){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 6. All pairwise categorical combinations — C(15,2) = 105 new category features{"\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#c586c0" }}>for</span><span> c1, c2 </span><span style={{ color: "#c586c0" }}>in</span><span> </span><span style={{ color: "#dcdcaa" }}>combinations</span><span>(cat_cols, </span><span style={{ color: "#b5cea8" }}>2</span><span>):{"\n"}</span>
+        <span>{"        "}nm = </span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>c1</span><span style={{ color: "#ce9178" }}>{"}"}_x_{"{"}</span><span>c2</span><span style={{ color: "#ce9178" }}>{"}"}"</span><span>{"\n"}</span>
+        <span>{"        "}Xf[nm]  = (Xc[c1].</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(str) + </span><span style={{ color: "#ce9178" }}>"_"</span><span> + Xc[c2].</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(str)).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(</span><span style={{ color: "#ce9178" }}>"category"</span><span>){"\n"}</span>
+        <span>{"        "}Xfv[nm] = (Xvc[c1].</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(str) + </span><span style={{ color: "#ce9178" }}>"_"</span><span> + Xvc[c2].</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(str)).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(</span><span style={{ color: "#ce9178" }}>"category"</span><span>){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 7. Interaction features{"\n"}</span>
+        <span>{"    "}Xf[</span><span style={{ color: "#ce9178" }}>"tenure_x_monthly"</span><span>]  = Xc[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>] * Xc[</span><span style={{ color: "#ce9178" }}>"MonthlyCharges"</span><span>]{"\n"}</span>
+        <span>{"    "}Xfv[</span><span style={{ color: "#ce9178" }}>"tenure_x_monthly"</span><span>] = Xvc[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>] * Xvc[</span><span style={{ color: "#ce9178" }}>"MonthlyCharges"</span><span>]{"\n"}</span>
+        <span>{"    "}Xf[</span><span style={{ color: "#ce9178" }}>"senior_x_monthly"</span><span>]  = Xc[</span><span style={{ color: "#ce9178" }}>"SeniorCitizen"</span><span>] * Xc[</span><span style={{ color: "#ce9178" }}>"MonthlyCharges"</span><span>]{"\n"}</span>
+        <span>{"    "}Xfv[</span><span style={{ color: "#ce9178" }}>"senior_x_monthly"</span><span>] = Xvc[</span><span style={{ color: "#ce9178" }}>"SeniorCitizen"</span><span>] * Xvc[</span><span style={{ color: "#ce9178" }}>"MonthlyCharges"</span><span>]{"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 8. Polynomial features (degree 2) on [tenure, MonthlyCharges, TotalCharges]{"\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}>#    → 3 squares + 3 cross-products = 9 total (PolynomialFeatures include_bias=False){"\n"}</span>
+        <span>{"    "}pi = [</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>, </span><span style={{ color: "#ce9178" }}>"MonthlyCharges"</span><span>, </span><span style={{ color: "#ce9178" }}>"TotalCharges"</span><span>]{"\n"}</span>
+        <span>{"    "}po = </span><span style={{ color: "#4ec9b0" }}>PolynomialFeatures</span><span>(degree=</span><span style={{ color: "#b5cea8" }}>2</span><span>, include_bias=</span><span style={{ color: "#569cd6" }}>False</span><span>){"\n"}</span>
+        <span>{"    "}pn = po.</span><span style={{ color: "#dcdcaa" }}>fit</span><span>(Xc[pi]).</span><span style={{ color: "#dcdcaa" }}>get_feature_names_out</span><span>(pi){"\n"}</span>
+        <span>{"    "}Xf[</span><span style={{ color: "#dcdcaa" }}>list</span><span>(pn)]  = po.</span><span style={{ color: "#dcdcaa" }}>fit_transform</span><span>(Xc[pi]){"\n"}</span>
+        <span>{"    "}Xfv[</span><span style={{ color: "#dcdcaa" }}>list</span><span>(pn)] = po.</span><span style={{ color: "#dcdcaa" }}>transform</span><span>(Xvc[pi]){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 9. Ratio &amp; log features (eps avoids divide-by-zero for tenure=0 customers){"\n"}</span>
+        <span>{"    "}eps = </span><span style={{ color: "#b5cea8" }}>1e-6</span><span>{"\n"}</span>
+        <span>{"    "}safe = Xc[</span><span style={{ color: "#ce9178" }}>"tenure"</span><span>].</span><span style={{ color: "#dcdcaa" }}>replace</span><span>(</span><span style={{ color: "#b5cea8" }}>0</span><span>, np.nan).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(eps) + eps{"\n"}</span>
+        <span>{"    "}Xf[</span><span style={{ color: "#ce9178" }}>"avg_charge_per_tenure"</span><span>] = Xc[</span><span style={{ color: "#ce9178" }}>"TotalCharges"</span><span>] / safe{"\n"}</span>
+        <span>{"    "}Xf[</span><span style={{ color: "#ce9178" }}>"log_avg_charge"</span><span>]        = np.</span><span style={{ color: "#dcdcaa" }}>log1p</span><span>(Xf[</span><span style={{ color: "#ce9178" }}>"avg_charge_per_tenure"</span><span>].</span><span style={{ color: "#dcdcaa" }}>clip</span><span>(lower=</span><span style={{ color: "#b5cea8" }}>0</span><span>)){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#6a9955" }}># 10. Group aggregates — 3 groups × 4 numerics × 3 stats = 36 features{"\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#c586c0" }}>for</span><span> g </span><span style={{ color: "#c586c0" }}>in</span><span> (</span><span style={{ color: "#ce9178" }}>"Contract"</span><span>, </span><span style={{ color: "#ce9178" }}>"InternetService"</span><span>, </span><span style={{ color: "#ce9178" }}>"PaymentMethod"</span><span>):{"\n"}</span>
+        <span>{"        "}</span><span style={{ color: "#c586c0" }}>for</span><span> nc </span><span style={{ color: "#c586c0" }}>in</span><span> num_cols:{"\n"}</span>
+        <span>{"            "}</span><span style={{ color: "#c586c0" }}>for</span><span> m </span><span style={{ color: "#c586c0" }}>in</span><span> (</span><span style={{ color: "#ce9178" }}>"mean"</span><span>, </span><span style={{ color: "#ce9178" }}>"median"</span><span>, </span><span style={{ color: "#ce9178" }}>"std"</span><span>):{"\n"}</span>
+        <span>{"                "}Xf[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>nc</span><span style={{ color: "#ce9178" }}>{"}"}_by_{"{"}</span><span>g</span><span style={{ color: "#ce9178" }}>{"}"}_{"{"}</span><span>m</span><span style={{ color: "#ce9178" }}>{"}"}"</span><span>]  = Xc.</span><span style={{ color: "#dcdcaa" }}>groupby</span><span>(g)[nc].</span><span style={{ color: "#dcdcaa" }}>transform</span><span>(m).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(</span><span style={{ color: "#b5cea8" }}>0</span><span>){"\n"}</span>
+        <span>{"                "}mp = Xc.</span><span style={{ color: "#dcdcaa" }}>groupby</span><span>(g)[nc].</span><span style={{ color: "#dcdcaa" }}>agg</span><span>(m).</span><span style={{ color: "#dcdcaa" }}>to_dict</span><span>(){"\n"}</span>
+        <span>{"                "}Xfv[</span><span style={{ color: "#ce9178" }}>f"{"{"}</span><span>nc</span><span style={{ color: "#ce9178" }}>{"}"}_by_{"{"}</span><span>g</span><span style={{ color: "#ce9178" }}>{"}"}_{"{"}</span><span>m</span><span style={{ color: "#ce9178" }}>{"}"}"</span><span>] = Xvc[g].</span><span style={{ color: "#dcdcaa" }}>map</span><span>(mp).</span><span style={{ color: "#dcdcaa" }}>fillna</span><span>(</span><span style={{ color: "#b5cea8" }}>0</span><span>){"\n\n"}</span>
+        <span>{"    "}</span><span style={{ color: "#c586c0" }}>return</span><span> Xf, Xfv</span>
+      </CodeBlock>
+
+      <Callout color="#f0f7ff" border="#3b82f6">
+        <strong>Why pairwise categorical combinations?</strong> The dataset has 15 categorical columns
+        (gender, Partner, Dependents, PhoneService, MultipleLines, InternetService, OnlineSecurity,
+        OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies, Contract,
+        PaperlessBilling, PaymentMethod). Taking all pairs gives C(15, 2) = <strong>105 new features</strong>,
+        each a string-concatenated combination like{" "}
+        <code style={{ ...mono, fontSize: "10px" }}>"Month-to-month_Fiber optic"</code> for{" "}
+        <code style={{ ...mono, fontSize: "10px" }}>Contract_x_InternetService</code>.
+        LightGBM treats these as native categorical features and can learn a separate
+        split threshold for each unique combination — something a linear model or OHE-based
+        tree cannot do efficiently. For example, "month-to-month contract + fiber optic internet"
+        has a far higher churn rate than either signal alone, and the pairwise feature exposes
+        that joint effect directly to the model. On the full Kaggle dataset these 105 features
+        are a major contributor to the 0.91367 AUC.
+      </Callout>
     </section>
   );
 }
