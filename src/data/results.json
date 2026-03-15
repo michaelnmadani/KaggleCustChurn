@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated_at": "2026-03-15T09:39:12.410367",
+    "generated_at": "2026-03-15T09:47:04.366981",
     "train_samples": 10000,
     "test_samples": 0,
     "cv_folds": 5,
@@ -9990,20 +9990,20 @@
         }
       ],
       "metrics": {
-        "accuracy": 0.7146,
-        "precision": 0.198,
-        "recall": 0.5701,
-        "f1": 0.2939,
+        "accuracy": 0.8502,
+        "precision": 0.272,
+        "recall": 0.261,
+        "f1": 0.2664,
         "roc_auc": 0.7154,
         "log_loss": 0.3548,
         "confusion_matrix": [
           [
-            6552,
-            2406
+            8230,
+            728
           ],
           [
-            448,
-            594
+            770,
+            272
           ]
         ],
         "roc_curve": {
@@ -10739,7 +10739,7 @@
           ]
         }
       },
-      "threshold": 0.2809,
+      "threshold": 0.4275,
       "score_bands": [
         {
           "band": "0-5%",
@@ -10807,20 +10807,20 @@
         }
       ],
       "metrics": {
-        "accuracy": 0.7156,
-        "precision": 0.1997,
-        "recall": 0.5749,
-        "f1": 0.2964,
+        "accuracy": 0.8502,
+        "precision": 0.272,
+        "recall": 0.261,
+        "f1": 0.2664,
         "roc_auc": 0.7157,
         "log_loss": 0.354,
         "confusion_matrix": [
           [
-            6557,
-            2401
+            8230,
+            728
           ],
           [
-            443,
-            599
+            770,
+            272
           ]
         ],
         "roc_curve": {
@@ -11556,7 +11556,7 @@
           ]
         }
       },
-      "threshold": 0.28,
+      "threshold": 0.4245,
       "score_bands": [
         {
           "band": "0-5%",
@@ -11644,19 +11644,19 @@
     },
     {
       "model": "Blend (Simple Avg)",
-      "accuracy": 0.7146,
-      "precision": 0.198,
-      "recall": 0.5701,
-      "f1": 0.2939,
+      "accuracy": 0.8502,
+      "precision": 0.272,
+      "recall": 0.261,
+      "f1": 0.2664,
       "roc_auc": 0.7154,
       "log_loss": 0.3548
     },
     {
       "model": "Blend (AUC-Weighted)",
-      "accuracy": 0.7156,
-      "precision": 0.1997,
-      "recall": 0.5749,
-      "f1": 0.2964,
+      "accuracy": 0.8502,
+      "precision": 0.272,
+      "recall": 0.261,
+      "f1": 0.2664,
       "roc_auc": 0.7157,
       "log_loss": 0.354
     }

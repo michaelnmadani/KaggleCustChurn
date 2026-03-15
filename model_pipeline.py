@@ -678,17 +678,17 @@ def blend_models(y, model_probs: dict):
     probs = np.stack([model_probs[n] for n in names], axis=1)
     aucs  = np.array([roc_auc_score(y, model_probs[n]) for n in names])
 
-    # Simple average — threshold set so ~30% of customers are predicted to churn
+    # Simple average — threshold set so top 10% of customers are predicted to churn
     simple_weights  = np.ones(len(names)) / len(names)
     y_prob_simple   = probs @ simple_weights
-    simple_thresh   = float(np.percentile(y_prob_simple, 70))
+    simple_thresh   = float(np.percentile(y_prob_simple, 90))
     y_pred_simple   = (y_prob_simple >= simple_thresh).astype(int)
     metrics_simple  = compute_metrics(y, y_pred_simple, y_prob_simple)
 
-    # AUC-weighted average — threshold set so ~30% of customers are predicted to churn
+    # AUC-weighted average — threshold set so top 10% of customers are predicted to churn
     auc_weights = aucs / aucs.sum()
     y_prob_auc  = probs @ auc_weights
-    auc_thresh  = float(np.percentile(y_prob_auc, 70))
+    auc_thresh  = float(np.percentile(y_prob_auc, 90))
     y_pred_auc  = (y_prob_auc >= auc_thresh).astype(int)
     metrics_auc = compute_metrics(y, y_pred_auc, y_prob_auc)
 
