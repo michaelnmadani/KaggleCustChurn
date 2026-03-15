@@ -666,9 +666,8 @@ def train_linear_regression_as_classifier(X, y, skf):
 
 def blend_models(y, model_probs: dict):
     """
-    Combine OOF probability outputs via two strategies:
-      • Simple average  — equal weight to every model
-      • AUC-weighted    — weight each model by its OOF AUC score
+    Combine OOF probability outputs via AUC-weighted soft-voting.
+    Each model is weighted proportional to its OOF AUC score.
     """
     print("[→] Building Blended Ensemble …")
 
@@ -678,13 +677,6 @@ def blend_models(y, model_probs: dict):
     probs = np.stack([model_probs[n] for n in names], axis=1)
     aucs  = np.array([roc_auc_score(y, model_probs[n]) for n in names])
 
-    # Simple average — threshold set so top 10% of customers are predicted to churn
-    simple_weights  = np.ones(len(names)) / len(names)
-    y_prob_simple   = probs @ simple_weights
-    simple_thresh   = float(np.percentile(y_prob_simple, 90))
-    y_pred_simple   = (y_prob_simple >= simple_thresh).astype(int)
-    metrics_simple  = compute_metrics(y, y_pred_simple, y_prob_simple)
-
     # AUC-weighted average — threshold set so top 10% of customers are predicted to churn
     auc_weights = aucs / aucs.sum()
     y_prob_auc  = probs @ auc_weights
@@ -692,17 +684,11 @@ def blend_models(y, model_probs: dict):
     y_pred_auc  = (y_prob_auc >= auc_thresh).astype(int)
     metrics_auc = compute_metrics(y, y_pred_auc, y_prob_auc)
 
-    simple_weight_table = [
-        {"model": n, "weight": round(float(w), 4), "auc": round(float(a), 4)}
-        for n, w, a in zip(names, simple_weights, aucs)
-    ]
     auc_weight_table = [
         {"model": n, "weight": round(float(w), 4), "auc": round(float(a), 4)}
         for n, w, a in zip(names, auc_weights, aucs)
     ]
 
-    print(f"[✓] Blend (simple)  — Accuracy: {metrics_simple['accuracy']:.4f}, "
-          f"AUC: {metrics_simple['roc_auc']:.4f}, F1: {metrics_simple['f1']:.4f}")
     print(f"[✓] Blend (AUC-wtd) — Accuracy: {metrics_auc['accuracy']:.4f}, "
           f"AUC: {metrics_auc['roc_auc']:.4f}, F1: {metrics_auc['f1']:.4f}")
 
@@ -710,20 +696,14 @@ def blend_models(y, model_probs: dict):
         "description": (
             "Soft-voting ensemble combining all five models — XGBoost, Random Forest, "
             "Logistic Regression, Linear Regression, and LightGBM — using out-of-fold "
-            "probability outputs. Two strategies: equal-weight average and AUC-weighted average."
+            "probability outputs weighted proportional to each model's OOF AUC score."
         ),
-        "simple_blend": {
-            "weights": simple_weight_table,
-            "metrics": metrics_simple,
-            "threshold": round(simple_thresh, 4),
-        },
         "auc_weighted_blend": {
             "weights": auc_weight_table,
             "metrics": metrics_auc,
             "threshold": round(auc_thresh, 4),
         },
-        "_simple_oof_probs": y_prob_simple,
-        "_auc_oof_probs":    y_prob_auc,
+        "_auc_oof_probs": y_prob_auc,
     }
 
 
@@ -1048,25 +1028,22 @@ def main():
     }
     blend_results = blend_models(y, model_probs)
 
-    # ── Score band analysis (OOF probs for all models + both blends) ──
-    blend_simple_probs = blend_results.pop("_simple_oof_probs")
-    blend_auc_probs    = blend_results.pop("_auc_oof_probs")
+    # ── Score band analysis (OOF probs for all models + blend) ──
+    blend_auc_probs = blend_results.pop("_auc_oof_probs")
     score_bands = {
         "xgboost":             compute_score_bands(y, model_probs["xgboost"]),
         "logistic_regression": compute_score_bands(y, model_probs["logistic_regression"]),
         "random_forest":       compute_score_bands(y, model_probs["random_forest"]),
         "linear_regression":   compute_score_bands(y, model_probs["linear_regression"]),
         "lightgbm":            compute_score_bands(y, model_probs["lightgbm"]),
-        "blend_simple":        compute_score_bands(y, blend_simple_probs),
         "blend_auc_weighted":  compute_score_bands(y, blend_auc_probs),
     }
-    # Attach score bands to each model result and blend sub-results
-    xgb_results["score_bands"]               = score_bands["xgboost"]
-    lr_results["score_bands"]                = score_bands["logistic_regression"]
-    rf_results["score_bands"]                = score_bands["random_forest"]
-    linreg_results["score_bands"]            = score_bands["linear_regression"]
-    lgbm_results["score_bands"]              = score_bands["lightgbm"]
-    blend_results["simple_blend"]["score_bands"]       = score_bands["blend_simple"]
+    # Attach score bands to each model result and blend sub-result
+    xgb_results["score_bands"]                         = score_bands["xgboost"]
+    lr_results["score_bands"]                          = score_bands["logistic_regression"]
+    rf_results["score_bands"]                          = score_bands["random_forest"]
+    linreg_results["score_bands"]                      = score_bands["linear_regression"]
+    lgbm_results["score_bands"]                        = score_bands["lightgbm"]
     blend_results["auc_weighted_blend"]["score_bands"] = score_bands["blend_auc_weighted"]
 
     print("\n── Score Band Summary (OOF predictions) ──")
@@ -1083,7 +1060,6 @@ def main():
         {"model": "Logistic Regression",  **lr_results["metrics"]},
         {"model": "Linear Regression",    **linreg_results["metrics"]},
         {"model": "LightGBM",             **lgbm_results["metrics"]},
-        {"model": "Blend (Simple Avg)",   **blend_results["simple_blend"]["metrics"]},
         {"model": "Blend (AUC-Weighted)", **blend_results["auc_weighted_blend"]["metrics"]},
     ]
     for row in model_comparison:
