@@ -1218,17 +1218,19 @@ function ConclusionSection({ data }) {
 
   return (
     <section>
-      <SectionHeading>4. Conclusion & Interpretation</SectionHeading>
+      <SectionHeading>4. Summary & Interpretation</SectionHeading>
 
       <P>
-        All four models achieve comparable F1 on this heavily imbalanced dataset.
-        XGBoost reaches <strong>{(xgbM.accuracy * 100).toFixed(1)}% accuracy</strong> (AUC {xgbM.roc_auc.toFixed(4)}),
-        Random Forest <strong>{(rfM.accuracy * 100).toFixed(1)}%</strong> (AUC {rfM.roc_auc.toFixed(4)}),
-        Logistic Regression <strong>{(lrM.accuracy * 100).toFixed(1)}%</strong> (AUC {lrM.roc_auc.toFixed(4)}),
-        and Linear Regression <strong>{(linM.accuracy * 100).toFixed(1)}%</strong> (AUC {linM.roc_auc.toFixed(4)}).
-        The <strong>equal-weight blend</strong> achieves <strong>{(bM.accuracy * 100).toFixed(1)}%</strong> (AUC {bM.roc_auc.toFixed(4)}),
-        and the <strong>AUC-weighted blend</strong> achieves <strong>{(wbM.accuracy * 100).toFixed(1)}%</strong> (AUC {wbM.roc_auc.toFixed(4)},
-        weights XGB:{wXgb.toFixed(3)} LR:{wLr.toFixed(3)} RF:{wRf.toFixed(3)} LinReg:{wLin.toFixed(3)}).
+        All four models achieve broadly comparable performance on this imbalanced dataset ({" "}
+        <strong>{(data.dataset_stats.churn_rate * 100).toFixed(1)}% churn rate</strong>,{" "}
+        {data.meta.train_samples.toLocaleString()} customers, {data.meta.n_features} features,{" "}
+        {data.meta.cv_folds}-fold stratified CV). AUC scores range from{" "}
+        <strong>{Math.min(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc).toFixed(4)}</strong> to{" "}
+        <strong>{Math.max(xgbM.roc_auc, rfM.roc_auc, lrM.roc_auc, linM.roc_auc).toFixed(4)}</strong>,
+        with F1 scores between{" "}
+        <strong>{(Math.min(xgbM.f1, rfM.f1, lrM.f1, linM.f1) * 100).toFixed(1)}%</strong> and{" "}
+        <strong>{(Math.max(xgbM.f1, rfM.f1, lrM.f1, linM.f1) * 100).toFixed(1)}%</strong>.
+        The blended ensembles are the top performers overall.
       </P>
 
       <Callout color="#faf5ff" border="#8b5cf6">
@@ -1342,18 +1344,28 @@ function ConclusionSection({ data }) {
         </div>
       </Figure>
 
-      {/* Bottom line */}
+      {/* Summary */}
       <div style={{ background: "#111", borderRadius: "8px", padding: "24px 28px", marginTop: "32px", marginBottom: "8px" }}>
         <div style={{ ...sans, fontSize: "10px", fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "10px" }}>
-          Bottom Line
+          Summary
         </div>
         <div style={{ ...serif, fontSize: "15px", lineHeight: 1.7, color: "#e5e5e5" }}>
-          XGBoost ({(xgbM.f1 * 100).toFixed(1)}% F1), Random Forest ({(rfM.f1 * 100).toFixed(1)}%),
-          Logistic Regression ({(lrM.f1 * 100).toFixed(1)}%), and Linear Regression with Youden's J
-          ({(linM.f1 * 100).toFixed(1)}%) all perform comparably on the imbalanced churn problem using{" "}
-          {data.meta.n_features} engineered features and {data.meta.cv_folds}-fold CV. Contract type,
-          tenure, and monthly charges dominate across all models. The AUC-weighted blend (
-          {(wbM.f1 * 100).toFixed(1)}% F1, AUC {wbM.roc_auc.toFixed(4)}) is the top performer.
+          The results here are <em>modest</em>. All four models produce comparable F1 scores —
+          XGBoost {(xgbM.f1 * 100).toFixed(1)}%, Random Forest {(rfM.f1 * 100).toFixed(1)}%,
+          Logistic Regression {(lrM.f1 * 100).toFixed(1)}%, Linear Regression {(linM.f1 * 100).toFixed(1)}% —
+          indicating that the available features ({data.meta.n_features} engineered from {data.meta.train_samples.toLocaleString()} customers
+          over {data.meta.cv_folds}-fold CV) are not yet sufficient to build a high-confidence churn predictor.
+          Depending on the business case these models may still be useful in practice, but significantly more work
+          on the existing data categories, or investigation into additional data sources, would be required before
+          production deployment.
+        </div>
+        <div style={{ ...serif, fontSize: "15px", lineHeight: 1.7, color: "#e5e5e5", marginTop: "14px" }}>
+          Of the models tested, the two blended ensembles are the top performers: the equal-weight blend
+          reaches AUC {bM.roc_auc.toFixed(4)} (F1 {(bM.f1 * 100).toFixed(1)}%) and the AUC-weighted blend
+          reaches AUC {wbM.roc_auc.toFixed(4)} (F1 {(wbM.f1 * 100).toFixed(1)}%, weights XGB {wXgb.toFixed(3)} ·
+          LR {wLr.toFixed(3)} · RF {wRf.toFixed(3)} · LinReg {wLin.toFixed(3)}). Soft-voting across
+          diverse base learners smooths individual model errors and provides the most stable predictions
+          on this imbalanced dataset.
         </div>
       </div>
     </section>
