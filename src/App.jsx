@@ -1286,7 +1286,10 @@ function ResultsSection({ data }) {
         <span style={{ color: "#6a9955" }}># Equal-weight soft-voting ensemble (all 5 models){"\n"}</span>
         <span>all_probs  = [xgb_prob, lr_prob, rf_prob, linreg_prob, lgbm_prob]{"\n"}</span>
         <span>blend_prob = </span><span style={{ color: "#dcdcaa" }}>sum</span><span>(all_probs) / </span><span style={{ color: "#b5cea8" }}>5.0</span><span>{"\n"}</span>
-        <span>blend_pred = (blend_prob &gt;= </span><span style={{ color: "#b5cea8" }}>0.5</span><span>).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(</span><span style={{ color: "#4ec9b0" }}>int</span><span>){"\n\n"}</span>
+        <span style={{ color: "#6a9955" }}># Threshold at 70th percentile → flag top 30% as predicted churn{"\n"}</span>
+        <span>thresh     = np.</span><span style={{ color: "#dcdcaa" }}>percentile</span><span>(blend_prob, </span><span style={{ color: "#b5cea8" }}>70</span><span>)  </span>
+        <span style={{ color: "#6a9955" }}># ≈ {data.blend.simple_blend.threshold}{"\n"}</span>
+        <span>blend_pred = (blend_prob &gt;= thresh).</span><span style={{ color: "#dcdcaa" }}>astype</span><span>(</span><span style={{ color: "#4ec9b0" }}>int</span><span>){"\n\n"}</span>
         <span style={{ color: "#6a9955" }}># AUC-weighted ensemble — weight proportional to each model's OOF AUC{"\n"}</span>
         <span>aucs    = [</span><span style={{ color: "#dcdcaa" }}>roc_auc_score</span><span>(y, p) </span><span style={{ color: "#c586c0" }}>for</span><span> p </span><span style={{ color: "#c586c0" }}>in</span><span> all_probs]{"\n"}</span>
         <span>weights = np.</span><span style={{ color: "#dcdcaa" }}>array</span><span>(aucs) / </span><span style={{ color: "#dcdcaa" }}>sum</span><span>(aucs){"\n"}</span>
@@ -1480,8 +1483,8 @@ function ConclusionSection({ data }) {
                 ["Logistic Reg.", `Acc ${(lrM.accuracy*100).toFixed(1)}%  F1 ${(lrM.f1*100).toFixed(1)}%  AUC ${lrM.roc_auc.toFixed(4)}`],
                 ["Linear Reg.",   `Acc ${(linM.accuracy*100).toFixed(1)}%  F1 ${(linM.f1*100).toFixed(1)}%  AUC ${linM.roc_auc.toFixed(4)}  thresh ${data.models.linear_regression.params.threshold}`],
                 ...(lgbmM ? [["LightGBM",  `Acc ${(lgbmM.accuracy*100).toFixed(1)}%  F1 ${(lgbmM.f1*100).toFixed(1)}%  AUC ${lgbmM.roc_auc.toFixed(4)}  thresh ${data.models.lightgbm.params.optimal_threshold}`]] : []),
-                ["Equal Blend",   `Acc ${(bM.accuracy*100).toFixed(1)}%  F1 ${(bM.f1*100).toFixed(1)}%  AUC ${bM.roc_auc.toFixed(4)}`],
-                ["AUC-Wtd Blend", `Acc ${(wbM.accuracy*100).toFixed(1)}%  F1 ${(wbM.f1*100).toFixed(1)}%  AUC ${wbM.roc_auc.toFixed(4)}`],
+                ["Equal Blend",   `Acc ${(bM.accuracy*100).toFixed(1)}%  F1 ${(bM.f1*100).toFixed(1)}%  AUC ${bM.roc_auc.toFixed(4)}  thresh ${data.blend.simple_blend.threshold} (top 30%)`],
+                ["AUC-Wtd Blend", `Acc ${(wbM.accuracy*100).toFixed(1)}%  F1 ${(wbM.f1*100).toFixed(1)}%  AUC ${wbM.roc_auc.toFixed(4)}  thresh ${data.blend.auc_weighted_blend.threshold} (top 30%)`],
               ].map(([label, detail], i) => (
                 <tr key={label} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
                   <td style={{ ...tdStyle, fontWeight: 600, color: "#222" }}>{label}</td>
